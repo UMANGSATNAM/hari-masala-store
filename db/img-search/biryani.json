@@ -1,0 +1,22 @@
+{
+  "success": true,
+  "query": "biryani masala indian spice powder",
+  "count": 2,
+  "ranked": false,
+  "results": [
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/f0378d392a2c.jpg",
+      "caption": "",
+      "source": "Swasthi's Recipes",
+      "original_width": "1200px",
+      "original_height": "1800px"
+    },
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/13b1e52b895b.jpg",
+      "caption": "",
+      "source": "Amazon.com",
+      "original_width": "2160px",
+      "original_height": "2160px"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "success": true,
+  "query": "nutmeg whole spice jaiphal brown",
+  "count": 2,
+  "ranked": false,
+  "results": [
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/dd931e1db990.jpg",
+      "caption": "",
+      "source": "Satvyk Store",
+      "original_width": "4672px",
+      "original_height": "4672px"
+    },
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/713a2ff19fa1.jpg",
+      "caption": "",
+      "source": "Swastik Spices",
+      "original_width": "1920px",
+      "original_height": "1920px"
+    }
+  ]
+}

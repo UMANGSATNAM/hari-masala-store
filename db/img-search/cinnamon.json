@@ -1,0 +1,22 @@
+{
+  "success": true,
+  "query": "cinnamon sticks dalchini spice",
+  "count": 2,
+  "ranked": false,
+  "results": [
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/4175868067e6.webp",
+      "caption": "",
+      "source": "Satopradhan",
+      "original_width": "1200px",
+      "original_height": "1200px"
+    },
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/ccf548cc9c6a.jpeg",
+      "caption": "",
+      "source": "Flipkart",
+      "original_width": "1242px",
+      "original_height": "1500px"
+    }
+  ]
+}

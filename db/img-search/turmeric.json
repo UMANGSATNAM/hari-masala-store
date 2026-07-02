@@ -1,0 +1,22 @@
+{
+  "success": true,
+  "query": "turmeric powder haldi in a bowl yellow spice",
+  "count": 2,
+  "ranked": false,
+  "results": [
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/bc4fd2c11f99.jpg",
+      "caption": "",
+      "source": "Bhumija Lifesciences",
+      "original_width": "2560px",
+      "original_height": "1709px"
+    },
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/90dce25b5ebc.jpg",
+      "caption": "",
+      "source": "Shutterstock",
+      "original_width": "1500px",
+      "original_height": "1132px"
+    }
+  ]
+}

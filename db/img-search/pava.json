@@ -1,0 +1,22 @@
+{
+  "success": true,
+  "query": "pav bhaji masala powder indian spice",
+  "count": 2,
+  "ranked": false,
+  "results": [
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/844dc1100aab.jpg",
+      "caption": "",
+      "source": "YouTube",
+      "original_width": "1280px",
+      "original_height": "720px"
+    },
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/34bed82a1034.jpg",
+      "caption": "",
+      "source": "Dassana's Veg Recipes",
+      "original_width": "1200px",
+      "original_height": "1800px"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "success": true,
+  "query": "cloves laung whole spice dark brown",
+  "count": 2,
+  "ranked": false,
+  "results": [
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/c501644cd5c5.png",
+      "caption": "",
+      "source": "eBay",
+      "original_width": "900px",
+      "original_height": "1200px"
+    },
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/5a20363c1e96.jpg",
+      "caption": "",
+      "source": "eBay",
+      "original_width": "950px",
+      "original_height": "950px"
+    }
+  ]
+}

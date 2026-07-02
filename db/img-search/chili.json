@@ -1,0 +1,22 @@
+{
+  "success": true,
+  "query": "red chili powder lal mirch spice in bowl",
+  "count": 2,
+  "ranked": false,
+  "results": [
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/a4b99e765f07.jpg",
+      "caption": "",
+      "source": "Kanz & Muhul",
+      "original_width": "3840px",
+      "original_height": "3841px"
+    },
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/46beaacad4db.jpg",
+      "caption": "",
+      "source": "Alamy",
+      "original_width": "1300px",
+      "original_height": "956px"
+    }
+  ]
+}

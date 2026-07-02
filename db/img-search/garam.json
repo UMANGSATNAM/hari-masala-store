@@ -1,0 +1,22 @@
+{
+  "success": true,
+  "query": "garam masala powder indian spice mix",
+  "count": 2,
+  "ranked": false,
+  "results": [
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/adf352665689.jpg",
+      "caption": "",
+      "source": "Amazon.com",
+      "original_width": "894px",
+      "original_height": "966px"
+    },
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/a095a65c3b65.jpg",
+      "caption": "",
+      "source": "Amazon.com",
+      "original_width": "2000px",
+      "original_height": "2000px"
+    }
+  ]
+}

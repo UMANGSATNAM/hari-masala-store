@@ -1,0 +1,22 @@
+{
+  "success": true,
+  "query": "black peppercorns whole spice kali mirch",
+  "count": 2,
+  "ranked": false,
+  "results": [
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/3e4b14085077.jpg",
+      "caption": "",
+      "source": "Sufalaam",
+      "original_width": "1536px",
+      "original_height": "1536px"
+    },
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/ddfb4584370f.jpg",
+      "caption": "",
+      "source": "Surya Masale",
+      "original_width": "1280px",
+      "original_height": "1280px"
+    }
+  ]
+}

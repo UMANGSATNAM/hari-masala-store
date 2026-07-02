@@ -1,0 +1,22 @@
+{
+  "success": true,
+  "query": "star anise spice chakri phool whole",
+  "count": 2,
+  "ranked": false,
+  "results": [
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/88699c3b8a04.jpg",
+      "caption": "",
+      "source": "Amazon.com",
+      "original_width": "1080px",
+      "original_height": "1080px"
+    },
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/5575af39f830.jpg",
+      "caption": "",
+      "source": "GreenDNA",
+      "original_width": "1500px",
+      "original_height": "1000px"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "success": true,
+  "query": "cumin seeds jeera whole spice brown",
+  "count": 2,
+  "ranked": false,
+  "results": [
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/15e9dd219788.jpg",
+      "caption": "",
+      "source": "Weaveskart",
+      "original_width": "1500px",
+      "original_height": "1500px"
+    },
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/c4eb5e690f99.jpg",
+      "caption": "",
+      "source": "Gandhi Foods",
+      "original_width": "1024px",
+      "original_height": "1017px"
+    }
+  ]
+}

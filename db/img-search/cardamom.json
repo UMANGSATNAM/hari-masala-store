@@ -1,0 +1,22 @@
+{
+  "success": true,
+  "query": "green cardamom pods elaichi spice",
+  "count": 2,
+  "ranked": false,
+  "results": [
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/6cd53fbd316a.jpg",
+      "caption": "",
+      "source": "IndiaBazaar.co.za",
+      "original_width": "1080px",
+      "original_height": "1080px"
+    },
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/fb2d281d3eea.png",
+      "caption": "",
+      "source": "grindpound",
+      "original_width": "2000px",
+      "original_height": "2000px"
+    }
+  ]
+}

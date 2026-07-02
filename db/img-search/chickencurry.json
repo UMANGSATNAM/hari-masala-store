@@ -1,0 +1,22 @@
+{
+  "success": true,
+  "query": "chicken curry masala powder indian spice",
+  "count": 2,
+  "ranked": false,
+  "results": [
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/192dee4bdcd1.webp",
+      "caption": "",
+      "source": "True Indian Spices",
+      "original_width": "1080px",
+      "original_height": "1080px"
+    },
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/3a7ce2134571.webp",
+      "caption": "",
+      "source": "moji masala",
+      "original_width": "1080px",
+      "original_height": "1080px"
+    }
+  ]
+}

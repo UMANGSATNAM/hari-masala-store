@@ -1,0 +1,22 @@
+{
+  "success": true,
+  "query": "saffron kesar red threads spice",
+  "count": 2,
+  "ranked": false,
+  "results": [
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/1a69198d52f1.jpg",
+      "caption": "",
+      "source": "eBay",
+      "original_width": "1200px",
+      "original_height": "937px"
+    },
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/5076ba14fb23.jpg",
+      "caption": "",
+      "source": "Zama Organics",
+      "original_width": "965px",
+      "original_height": "965px"
+    }
+  ]
+}

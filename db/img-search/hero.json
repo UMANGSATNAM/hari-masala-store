@@ -1,0 +1,22 @@
+{
+  "success": true,
+  "query": "colorful indian spices bowls arrangement flat lay",
+  "count": 2,
+  "ranked": false,
+  "results": [
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/26bad4ef5b84.jpg",
+      "caption": "",
+      "source": "Pinterest",
+      "original_width": "736px",
+      "original_height": "1104px"
+    },
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/9c6ac20717a9.jpg",
+      "caption": "",
+      "source": "123RF",
+      "original_width": "866px",
+      "original_height": "1300px"
+    }
+  ]
+}

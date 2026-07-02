@@ -1,0 +1,22 @@
+{
+  "success": true,
+  "query": "chaat masala powder indian spice black",
+  "count": 2,
+  "ranked": false,
+  "results": [
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/a252ea064ed6.jpg",
+      "caption": "",
+      "source": "Amazon.com",
+      "original_width": "2560px",
+      "original_height": "2560px"
+    },
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/24ba7b464aa4.jpg",
+      "caption": "",
+      "source": "YouTube",
+      "original_width": "1280px",
+      "original_height": "720px"
+    }
+  ]
+}
