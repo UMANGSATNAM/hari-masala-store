@@ -87,22 +87,24 @@ export function ProductCard({ product }: { product: Product }) {
           </span>
         </div>
 
-        <div className="mt-auto pt-3 flex items-end justify-between gap-2">
-          <div className="flex flex-col">
-            <span className="text-lg font-bold text-primary">
-              {formatINR(product.price)}
-            </span>
-            {discount > 0 && (
-              <span className="text-xs text-muted-foreground line-through">
-                {formatINR(product.mrp)}
+        <div className="mt-auto pt-3 flex flex-col gap-2">
+          <div className="flex items-end justify-between gap-2">
+            <div className="flex flex-col">
+              <span className="text-lg font-bold text-primary leading-none">
+                {formatINR(product.price)}
               </span>
-            )}
+              {discount > 0 && (
+                <span className="text-xs text-muted-foreground line-through mt-0.5">
+                  {formatINR(product.mrp)}
+                </span>
+              )}
+            </div>
           </div>
           <Button
             size="sm"
             onClick={handleAdd}
             disabled={outOfStock}
-            className={`h-9 px-3 transition-all ${
+            className={`w-full h-9 px-2 transition-all text-xs sm:text-sm ${
               added
                 ? 'bg-green-600 hover:bg-green-600 text-white'
                 : 'bg-primary-gradient hover:opacity-90'
@@ -110,11 +112,11 @@ export function ProductCard({ product }: { product: Product }) {
           >
             {added ? (
               <>
-                <Check className="h-4 w-4 mr-1" /> Added to Cart
+                <Check className="h-4 w-4 mr-1 shrink-0" /> Added
               </>
             ) : (
               <>
-                <Plus className="h-4 w-4 mr-1" /> Add to Cart
+                <Plus className="h-4 w-4 mr-1 shrink-0" /> Add to Cart
               </>
             )}
           </Button>
