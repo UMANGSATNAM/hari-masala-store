@@ -1,0 +1,15 @@
+{
+  "success": true,
+  "query": "mixed dried fruits assortment",
+  "count": 1,
+  "ranked": false,
+  "results": [
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/16993bad24e4.jpg",
+      "caption": "",
+      "source": "RawFruit",
+      "original_width": "2000px",
+      "original_height": "2800px"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "success": true,
+  "query": "dried strawberry slices fruit",
+  "count": 1,
+  "ranked": false,
+  "results": [
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/b786bd56ca24.jpg",
+      "caption": "",
+      "source": "The Gourmet Warehouse",
+      "original_width": "1028px",
+      "original_height": "1028px"
+    }
+  ]
+}

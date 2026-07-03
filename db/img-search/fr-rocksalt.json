@@ -1,0 +1,15 @@
+{
+  "success": true,
+  "query": "rock salt sindhav pink crystals",
+  "count": 1,
+  "ranked": false,
+  "results": [
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/61fc2552ff6c.jpg",
+      "caption": "",
+      "source": "Amazon.in",
+      "original_width": "866px",
+      "original_height": "1000px"
+    }
+  ]
+}

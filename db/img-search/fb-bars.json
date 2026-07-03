@@ -1,0 +1,15 @@
+{
+  "success": true,
+  "query": "fruit bars healthy snack no sugar",
+  "count": 1,
+  "ranked": false,
+  "results": [
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/6b1dcc9ab4ab.jpg",
+      "caption": "",
+      "source": "Happy Village",
+      "original_width": "1946px",
+      "original_height": "1946px"
+    }
+  ]
+}

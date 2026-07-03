@@ -1,0 +1,15 @@
+{
+  "success": true,
+  "query": "orange fruit candy bites snack",
+  "count": 1,
+  "ranked": false,
+  "results": [
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/84db66c4f10f.jpg",
+      "caption": "",
+      "source": "A Spicy Perspective",
+      "original_width": "1200px",
+      "original_height": "1686px"
+    }
+  ]
+}

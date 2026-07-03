@@ -1,0 +1,15 @@
+{
+  "success": true,
+  "query": "hing powder asafoetida yellow",
+  "count": 1,
+  "ranked": false,
+  "results": [
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/89f47521aee9.jpg",
+      "caption": "",
+      "source": "Amazon.com",
+      "original_width": "894px",
+      "original_height": "929px"
+    }
+  ]
+}

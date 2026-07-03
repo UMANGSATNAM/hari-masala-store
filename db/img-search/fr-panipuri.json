@@ -1,0 +1,15 @@
+{
+  "success": true,
+  "query": "pani puri golgappa kit snack",
+  "count": 1,
+  "ranked": false,
+  "results": [
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/18fae5d12f89.jpg",
+      "caption": "",
+      "source": "Amazon.in",
+      "original_width": "1000px",
+      "original_height": "1001px"
+    }
+  ]
+}

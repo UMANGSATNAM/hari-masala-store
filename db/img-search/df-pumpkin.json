@@ -1,0 +1,15 @@
+{
+  "success": true,
+  "query": "pumpkin seeds green healthy",
+  "count": 1,
+  "ranked": false,
+  "results": [
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/373618175d08.jpg",
+      "caption": "",
+      "source": "أورجانيك ستيشن",
+      "original_width": "5320px",
+      "original_height": "5320px"
+    }
+  ]
+}

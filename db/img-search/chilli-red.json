@@ -1,0 +1,15 @@
+{
+  "success": true,
+  "query": "red chilli powder lal mirch bright red",
+  "count": 1,
+  "ranked": false,
+  "results": [
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/4e088b6d864d.jpg",
+      "caption": "",
+      "source": "Moon Rice",
+      "original_width": "1200px",
+      "original_height": "1200px"
+    }
+  ]
+}

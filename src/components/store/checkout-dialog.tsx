@@ -61,7 +61,7 @@ export function CheckoutDialog({
       const orderItems = items.map((i) => ({
         id: i.id,
         name: i.name,
-        hindiName: i.hindiName,
+        gujaratiName: i.gujaratiName,
         price: i.price,
         quantity: i.quantity,
         weight: i.weight,
@@ -157,8 +157,8 @@ export function CheckoutDialog({
               <ul className="space-y-1 max-h-32 overflow-y-auto scrollbar-thin">
                 {items.map((i) => (
                   <li key={i.id} className="flex justify-between text-sm">
-                    <span className="truncate pr-2">
-                      {i.name} <span className="text-muted-foreground">× {i.quantity}</span>
+                    <span className="truncate pr-2" lang="gu">
+                      {i.gujaratiName ? `${i.gujaratiName} (${i.name})` : i.name} <span className="text-muted-foreground">× {i.quantity}</span>
                     </span>
                     <span className="font-medium shrink-0">{formatINR(i.price * i.quantity)}</span>
                   </li>

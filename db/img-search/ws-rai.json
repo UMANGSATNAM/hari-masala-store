@@ -1,0 +1,15 @@
+{
+  "success": true,
+  "query": "mustard seeds yellow rai spice",
+  "count": 1,
+  "ranked": false,
+  "results": [
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/855d2fab7638.jpg",
+      "caption": "",
+      "source": "Amazon.com",
+      "original_width": "1414px",
+      "original_height": "1717px"
+    }
+  ]
+}

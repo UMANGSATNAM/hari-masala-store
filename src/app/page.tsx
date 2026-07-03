@@ -54,7 +54,7 @@ export default function Home() {
       list = list.filter(
         (p) =>
           p.name.toLowerCase().includes(q) ||
-          (p.hindiName || '').toLowerCase().includes(q) ||
+          (p.gujaratiName || '').toLowerCase().includes(q) ||
           p.description.toLowerCase().includes(q)
       )
     }

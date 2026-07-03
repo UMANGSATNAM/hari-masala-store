@@ -1,0 +1,15 @@
+{
+  "success": true,
+  "query": "aam panna mango drink powder",
+  "count": 1,
+  "ranked": false,
+  "results": [
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/f87456bc89e6.jpg",
+      "caption": "",
+      "source": "A Li'l Bit of Spice",
+      "original_width": "3648px",
+      "original_height": "5472px"
+    }
+  ]
+}

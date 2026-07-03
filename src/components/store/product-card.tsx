@@ -19,8 +19,9 @@ export function ProductCard({ product }: { product: Product }) {
     if (outOfStock) return
     add(product, 1)
     setAdded(true)
-    toast.success(`${product.name} added to cart`)
-    setTimeout(() => setAdded(false), 1200)
+    const label = product.gujaratiName ? `${product.gujaratiName} (${product.name})` : product.name
+    toast.success(`✓ ${label} added to cart`, { duration: 2000 })
+    setTimeout(() => setAdded(false), 1800)
   }
 
   return (
@@ -59,12 +60,12 @@ export function ProductCard({ product }: { product: Product }) {
       <div className="flex flex-1 flex-col p-3 sm:p-4">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
-            <h3 className="font-semibold text-sm sm:text-base text-foreground truncate">
-              {product.name}
-            </h3>
-            {product.hindiName && (
-              <p className="text-xs text-muted-foreground">{product.hindiName}</p>
+            {product.gujaratiName && (
+              <h3 className="font-semibold text-sm sm:text-base text-foreground truncate leading-tight" lang="gu">
+                {product.gujaratiName}
+              </h3>
             )}
+            <p className="text-xs text-muted-foreground truncate">{product.name}</p>
           </div>
           <div className="flex items-center gap-0.5 shrink-0 text-amber-500">
             <Star className="h-3.5 w-3.5 fill-current" />
@@ -100,15 +101,19 @@ export function ProductCard({ product }: { product: Product }) {
             size="sm"
             onClick={handleAdd}
             disabled={outOfStock}
-            className="bg-spice-gradient hover:opacity-90 h-9 px-3"
+            className={`h-9 px-3 transition-all ${
+              added
+                ? 'bg-green-600 hover:bg-green-600 text-white'
+                : 'bg-spice-gradient hover:opacity-90'
+            }`}
           >
             {added ? (
               <>
-                <Check className="h-4 w-4 mr-1" /> Added
+                <Check className="h-4 w-4 mr-1" /> Added to Cart
               </>
             ) : (
               <>
-                <Plus className="h-4 w-4 mr-1" /> Add
+                <Plus className="h-4 w-4 mr-1" /> Add to Cart
               </>
             )}
           </Button>

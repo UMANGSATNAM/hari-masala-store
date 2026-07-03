@@ -10,7 +10,7 @@ export type Product = {
   id: string
   name: string
   slug: string
-  hindiName: string | null
+  gujaratiName: string | null
   description: string
   price: number
   mrp: number
@@ -29,7 +29,7 @@ export type Product = {
 export type CartItem = {
   id: string
   name: string
-  hindiName: string | null
+  gujaratiName: string | null
   slug: string
   price: number
   mrp: number
@@ -42,7 +42,7 @@ export type CartItem = {
 export type OrderItem = {
   id: string
   name: string
-  hindiName: string | null
+  gujaratiName: string | null
   price: number
   quantity: number
   weight: string

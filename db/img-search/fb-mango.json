@@ -1,0 +1,15 @@
+{
+  "success": true,
+  "query": "mango fruit bites candy snack",
+  "count": 1,
+  "ranked": false,
+  "results": [
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/b4d4c3615492.jpg",
+      "caption": "",
+      "source": "Goso Gummies",
+      "original_width": "1400px",
+      "original_height": "1400px"
+    }
+  ]
+}

@@ -42,7 +42,7 @@ export const api = {
     customerCity?: string
     customerPincode?: string
     notes?: string
-    items: { id: string; name: string; hindiName: string | null; price: number; quantity: number; weight: string }[]
+    items: { id: string; name: string; gujaratiName: string | null; price: number; quantity: number; weight: string }[]
   }) => jfetch<{ order: Order }>(`/api/orders`, { method: 'POST', body: JSON.stringify(data) }),
   getOrders: (status?: string) => {
     const q = status && status !== 'all' ? `?status=${status}` : ''

@@ -40,7 +40,7 @@ export const useCart = create<CartState>()(
               {
                 id: product.id,
                 name: product.name,
-                hindiName: product.hindiName,
+                gujaratiName: product.gujaratiName,
                 slug: product.slug,
                 price: product.price,
                 mrp: product.mrp,

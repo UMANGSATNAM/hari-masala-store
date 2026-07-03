@@ -1,0 +1,15 @@
+{
+  "success": true,
+  "query": "kokum dried black fruit spice",
+  "count": 1,
+  "ranked": false,
+  "results": [
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/1ac782917bde.jpg",
+      "caption": "",
+      "source": "Amazon.com",
+      "original_width": "1910px",
+      "original_height": "1000px"
+    }
+  ]
+}

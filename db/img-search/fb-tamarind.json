@@ -1,0 +1,15 @@
+{
+  "success": true,
+  "query": "tamarind fruit bar candy",
+  "count": 1,
+  "ranked": false,
+  "results": [
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/1d386d3446fe.jpg",
+      "caption": "",
+      "source": "Cooking with Alison",
+      "original_width": "2736px",
+      "original_height": "3648px"
+    }
+  ]
+}

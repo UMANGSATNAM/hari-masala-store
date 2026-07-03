@@ -1,0 +1,15 @@
+{
+  "success": true,
+  "query": "sunflower seeds bowl healthy",
+  "count": 1,
+  "ranked": false,
+  "results": [
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/a58ed92fac9f.jpg",
+      "caption": "",
+      "source": "Amazon.in",
+      "original_width": "1024px",
+      "original_height": "1536px"
+    }
+  ]
+}

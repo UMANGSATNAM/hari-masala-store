@@ -1,0 +1,15 @@
+{
+  "success": true,
+  "query": "hing asafoetida solid lump spice",
+  "count": 1,
+  "ranked": false,
+  "results": [
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/a91a0b480977.jpg",
+      "caption": "",
+      "source": "Amazon.in",
+      "original_width": "1707px",
+      "original_height": "2560px"
+    }
+  ]
+}

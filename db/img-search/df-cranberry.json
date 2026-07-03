@@ -1,0 +1,15 @@
+{
+  "success": true,
+  "query": "dried cranberries red fruit",
+  "count": 1,
+  "ranked": false,
+  "results": [
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/27a99bfa0ece.jpg",
+      "caption": "",
+      "source": "Govindjee Store",
+      "original_width": "1200px",
+      "original_height": "1200px"
+    }
+  ]
+}

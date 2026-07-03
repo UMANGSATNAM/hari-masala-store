@@ -27,13 +27,13 @@ import type { Category, Product } from '@/lib/types'
 import { toast } from 'sonner'
 
 type FormState = {
-  name: string; hindiName: string; description: string; price: string; mrp: string
+  name: string; gujaratiName: string; description: string; price: string; mrp: string
   weight: string; categoryId: string; image: string; stock: string; featured: boolean
   active: boolean; rating: string
 }
 
 const emptyForm: FormState = {
-  name: '', hindiName: '', description: '', price: '', mrp: '', weight: '100g',
+  name: '', gujaratiName: '', description: '', price: '', mrp: '', weight: '100g',
   categoryId: '', image: '', stock: '50', featured: false, active: true, rating: '4.5',
 }
 
@@ -82,7 +82,7 @@ export function AdminProducts({ categories }: { categories: Category[] }) {
   const filtered = products.filter(
     (p) =>
       p.name.toLowerCase().includes(search.toLowerCase()) ||
-      (p.hindiName || '').toLowerCase().includes(search.toLowerCase())
+      (p.gujaratiName || '').toLowerCase().includes(search.toLowerCase())
   )
 
   const openCreate = () => {
@@ -94,7 +94,7 @@ export function AdminProducts({ categories }: { categories: Category[] }) {
   const openEdit = (p: Product) => {
     setEditing(p)
     setForm({
-      name: p.name, hindiName: p.hindiName || '', description: p.description,
+      name: p.name, gujaratiName: p.gujaratiName || '', description: p.description,
       price: String(p.price), mrp: String(p.mrp), weight: p.weight,
       categoryId: p.categoryId, image: p.image, stock: String(p.stock),
       featured: p.featured, active: p.active, rating: String(p.rating),
@@ -110,7 +110,7 @@ export function AdminProducts({ categories }: { categories: Category[] }) {
     setSaving(true)
     try {
       const payload = {
-        name: form.name, hindiName: form.hindiName || null, description: form.description,
+        name: form.name, gujaratiName: form.gujaratiName || null, description: form.description,
         price: Number(form.price), mrp: Number(form.mrp) || Number(form.price),
         weight: form.weight, categoryId: form.categoryId, image: form.image,
         stock: Number(form.stock), featured: form.featured, active: form.active,
@@ -248,8 +248,8 @@ export function AdminProducts({ categories }: { categories: Category[] }) {
                       { }
                       <img src={p.image} alt={p.name} className="h-10 w-10 rounded-md object-cover border border-border" />
                       <div className="min-w-0">
-                        <p className="font-medium text-foreground truncate max-w-[180px]">{p.name}</p>
-                        <p className="text-xs text-muted-foreground">{p.weight}</p>
+                        <p className="font-medium text-foreground truncate max-w-[180px]" lang="gu">{p.gujaratiName || p.name}</p>
+                        <p className="text-xs text-muted-foreground truncate">{p.name} · {p.weight}</p>
                       </div>
                     </div>
                   </td>
@@ -327,8 +327,8 @@ export function AdminProducts({ categories }: { categories: Category[] }) {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <p className="font-medium text-sm text-foreground truncate">{p.name}</p>
-                      <p className="text-xs text-muted-foreground">{catName(p.categoryId)} · {p.weight}</p>
+                      <p className="font-medium text-sm text-foreground truncate" lang="gu">{p.gujaratiName || p.name}</p>
+                      <p className="text-xs text-muted-foreground truncate">{p.name} · {p.weight}</p>
                     </div>
                     {p.featured && <Badge className="bg-saffron-gradient text-secondary-foreground text-[10px]">★</Badge>}
                   </div>
@@ -393,8 +393,8 @@ export function AdminProducts({ categories }: { categories: Category[] }) {
                 <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="e.g. Turmeric Powder" />
               </div>
               <div className="grid gap-1.5">
-                <Label>Hindi Name</Label>
-                <Input value={form.hindiName} onChange={(e) => setForm({ ...form, hindiName: e.target.value })} placeholder="e.g. Haldi" />
+                <Label>Gujarati Name</Label>
+                <Input value={form.gujaratiName} onChange={(e) => setForm({ ...form, gujaratiName: e.target.value })} placeholder="e.g. હળદર" lang="gu" />
               </div>
             </div>
             <div className="grid gap-1.5">

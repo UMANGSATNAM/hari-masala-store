@@ -1,0 +1,15 @@
+{
+  "success": true,
+  "query": "sabudana tapioca pearls white",
+  "count": 1,
+  "ranked": false,
+  "results": [
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/b1218092a9bb.jpg",
+      "caption": "",
+      "source": "Amazon.com",
+      "original_width": "1224px",
+      "original_height": "1500px"
+    }
+  ]
+}

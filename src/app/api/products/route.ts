@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
   if (search) {
     where.OR = [
       { name: { contains: search } },
-      { hindiName: { contains: search } },
+      { gujaratiName: { contains: search } },
       { description: { contains: search } },
     ]
   }
@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
     const {
-      name, hindiName, description, price, mrp, weight,
+      name, gujaratiName, description, price, mrp, weight,
       categoryId, image, stock, featured, active, rating,
     } = body
 
@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
     const product = await db.product.create({
       data: {
         name,
-        hindiName: hindiName || null,
+        gujaratiName: gujaratiName || null,
         slug,
         description,
         price: Number(price),

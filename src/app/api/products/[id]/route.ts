@@ -11,7 +11,7 @@ export async function PUT(
 
     const data: Record<string, unknown> = {}
     const fields = [
-      'name', 'hindiName', 'description', 'price', 'mrp', 'weight',
+      'name', 'gujaratiName', 'description', 'price', 'mrp', 'weight',
       'categoryId', 'image', 'stock', 'featured', 'active', 'rating',
     ]
     for (const f of fields) {

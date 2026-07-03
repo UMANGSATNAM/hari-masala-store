@@ -1,0 +1,15 @@
+{
+  "success": true,
+  "query": "dried mango slices fruit",
+  "count": 1,
+  "ranked": false,
+  "results": [
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/61a9ff1d541c.png",
+      "caption": "",
+      "source": "Wildly Organic",
+      "original_width": "1536px",
+      "original_height": "1024px"
+    }
+  ]
+}

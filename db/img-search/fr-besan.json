@@ -1,0 +1,15 @@
+{
+  "success": true,
+  "query": "besan gram flour powder yellow",
+  "count": 1,
+  "ranked": false,
+  "results": [
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/a00a08cd4061.jpg",
+      "caption": "",
+      "source": "Amazon.com",
+      "original_width": "2000px",
+      "original_height": "2000px"
+    }
+  ]
+}

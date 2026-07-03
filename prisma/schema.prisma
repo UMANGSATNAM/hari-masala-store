@@ -18,23 +18,23 @@ model Category {
 }
 
 model Product {
-  id          String   @id @default(cuid())
-  name        String
-  slug        String   @unique
-  hindiName   String?
-  description String
-  price       Float
-  mrp         Float
-  weight      String
-  categoryId  String
-  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  image       String
-  stock       Int      @default(50)
-  featured    Boolean  @default(false)
-  active      Boolean  @default(true)
-  rating      Float    @default(4.5)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String   @id @default(cuid())
+  name          String
+  slug          String   @unique
+  gujaratiName  String?
+  description   String
+  price         Float
+  mrp           Float
+  weight        String
+  categoryId    String
+  category      Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  image         String
+  stock         Int      @default(50)
+  featured      Boolean  @default(false)
+  active        Boolean  @default(true)
+  rating        Float    @default(4.5)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model Order {

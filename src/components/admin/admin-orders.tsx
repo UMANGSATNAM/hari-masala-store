@@ -240,8 +240,8 @@ export function AdminOrders({ settings }: { settings: Settings }) {
                 <ul className="divide-y divide-border">
                   {parseItems(viewOrder).map((it, idx) => (
                     <li key={idx} className="flex justify-between px-3 py-2 text-sm">
-                      <span className="text-foreground">
-                        {it.name}{it.hindiName ? ` (${it.hindiName})` : ''} · {it.weight}
+                      <span className="text-foreground" lang="gu">
+                        {it.gujaratiName ? `${it.gujaratiName} (${it.name})` : it.name} · {it.weight}
                         <span className="text-muted-foreground"> × {it.quantity}</span>
                       </span>
                       <span className="font-medium">{formatINR(it.price * it.quantity)}</span>

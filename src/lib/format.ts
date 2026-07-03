@@ -9,7 +9,23 @@ export function discountPercent(mrp: number, price: number): number {
   return Math.round(((mrp - price) / mrp) * 100)
 }
 
-/** Build a WhatsApp order message and a wa.me link. */
+/**
+ * Build a WhatsApp order message in the EXACT format:
+ *
+ * New Order — Hari Masala
+ *
+ * Name: <name>
+ * Mobile: <phone>
+ * Address: <address>, <city>, Gujarat - <pincode>
+ *
+ * Order Details:
+ * * ગુજરાતી નામ (English Name) (weight) xN = ₹price
+ * ...
+ *
+ * Total: ₹<total>
+ *
+ * Please confirm my order
+ */
 export function buildWhatsAppOrder(args: {
   items: CartItem[]
   subtotal: number
@@ -25,32 +41,32 @@ export function buildWhatsAppOrder(args: {
 }): { text: string; url: string } {
   const { items, subtotal, settings, customer } = args
 
+  // Address line: "address, city, Gujarat - pincode" (matches the requested format)
+  const addrParts: string[] = [customer.address.trim()]
+  if (customer.city?.trim()) addrParts.push(customer.city.trim())
+  addrParts.push('Gujarat')
+  const addrLine = addrParts.join(', ') + (customer.pincode?.trim() ? ` - ${customer.pincode.trim()}` : '')
+
   const lines: string[] = []
-  lines.push(`*${settings.storeName} — New Order*`)
-  lines.push(`Order from website`)
+  lines.push(`New Order — ${settings.storeName}`)
   lines.push('')
-  lines.push('*🧾 Items:*')
-  items.forEach((it, idx) => {
-    lines.push(
-      `${idx + 1}. ${it.name}${it.hindiName ? ` (${it.hindiName})` : ''} — ${it.weight}`
-    )
-    lines.push(
-      `   ${it.quantity} x ${formatINR(it.price)} = *${formatINR(it.price * it.quantity)}*`
-    )
+  lines.push(`Name: ${customer.name}`)
+  lines.push(`Mobile: ${customer.phone}`)
+  lines.push(`Address: ${addrLine}`)
+  lines.push('')
+  lines.push('Order Details:')
+  items.forEach((it) => {
+    const guj = it.gujaratiName ? `${it.gujaratiName} (${it.name})` : it.name
+    lines.push(`* ${guj} (${it.weight}) x${it.quantity} = ${formatINR(it.price * it.quantity)}`)
   })
   lines.push('')
-  lines.push(`*Total Items:* ${items.reduce((s, i) => s + i.quantity, 0)}`)
-  lines.push(`*Total Amount:* ${formatINR(subtotal)}`)
+  lines.push(`Total: ${formatINR(subtotal)}`)
+  if (customer.notes?.trim()) {
+    lines.push('')
+    lines.push(`Notes: ${customer.notes.trim()}`)
+  }
   lines.push('')
-  lines.push('*👤 Customer Details:*')
-  lines.push(`Name: ${customer.name}`)
-  lines.push(`Phone: ${customer.phone}`)
-  lines.push(`Address: ${customer.address}`)
-  if (customer.city) lines.push(`City: ${customer.city}`)
-  if (customer.pincode) lines.push(`Pincode: ${customer.pincode}`)
-  if (customer.notes) lines.push(`Notes: ${customer.notes}`)
-  lines.push('')
-  lines.push('_Please confirm my order. Payment will be made on delivery._')
+  lines.push('Please confirm my order')
 
   const text = lines.join('\n')
   const url = `https://wa.me/${settings.whatsappNumber}?text=${encodeURIComponent(text)}`

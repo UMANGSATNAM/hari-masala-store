@@ -1,0 +1,15 @@
+{
+  "success": true,
+  "query": "dried blueberries fruit",
+  "count": 1,
+  "ranked": false,
+  "results": [
+    {
+      "original_url": "https://sfile.chatglm.cn/images-ppt/0430646f7ec6.png",
+      "caption": "",
+      "source": "Mariani",
+      "original_width": "1200px",
+      "original_height": "1200px"
+    }
+  ]
+}
