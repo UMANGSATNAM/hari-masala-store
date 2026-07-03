@@ -163,7 +163,7 @@ export function AdminSettings({
       </Card>
 
       <div className="flex justify-end">
-        <Button onClick={save} disabled={saving} className="bg-spice-gradient hover:opacity-90 h-11 px-6">
+        <Button onClick={save} disabled={saving} className="bg-primary-gradient hover:opacity-90 h-11 px-6">
           {saving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
           Save Settings
         </Button>

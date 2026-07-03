@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { StoreHeader } from './store-header'
 import { Hero } from './hero'
+import { CategoryCards } from './category-cards'
 import { ShopSection } from './shop-section'
 import { FeaturesSection } from './features-section'
 import { StoreFooter } from './store-footer'
@@ -38,6 +39,11 @@ export function Storefront({
       <StoreHeader settings={settings} onSearch={onSearch} />
       <main className="flex-1">
         <Hero settings={settings} />
+        <CategoryCards
+          categories={categories}
+          products={products}
+          onSelect={onCategoryChange}
+        />
         <ShopSection
           categories={categories}
           products={products}

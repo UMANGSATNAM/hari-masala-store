@@ -58,7 +58,7 @@ export function FeaturesSection() {
               key={f.title}
               className="flex gap-3 rounded-xl border border-border bg-card p-5 shadow-sm hover:shadow-md transition-shadow"
             >
-              <div className="grid place-items-center h-11 w-11 shrink-0 rounded-lg bg-spice-gradient text-primary-foreground">
+              <div className="grid place-items-center h-11 w-11 shrink-0 rounded-lg bg-primary-gradient text-primary-foreground">
                 <f.icon className="h-5 w-5" />
               </div>
               <div>

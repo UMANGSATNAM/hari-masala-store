@@ -143,7 +143,7 @@ export function CheckoutDialog({
             >
               <MessageCircle className="h-4 w-4" /> Open WhatsApp again
             </a>
-            <Button onClick={() => handleClose(false)} className="mt-5 bg-spice-gradient hover:opacity-90">
+            <Button onClick={() => handleClose(false)} className="mt-5 bg-primary-gradient hover:opacity-90">
               Continue Shopping
             </Button>
           </div>

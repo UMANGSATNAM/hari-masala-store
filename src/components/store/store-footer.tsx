@@ -13,13 +13,13 @@ export function StoreFooter({
   const phoneDisplay = `+${settings.whatsappNumber.slice(0, 2)} ${settings.whatsappNumber.slice(2, 7)} ${settings.whatsappNumber.slice(7)}`
 
   return (
-    <footer id="contact" className="bg-foreground text-background mt-auto">
+    <footer id="contact" className="bg-primary-gradient text-primary-foreground mt-auto">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="sm:col-span-2 lg:col-span-1">
             <div className="flex items-center gap-2 mb-3">
-              <span className="grid place-items-center h-9 w-9 rounded-full bg-spice-gradient text-primary-foreground">
+              <span className="grid place-items-center h-9 w-9 rounded-full bg-primary-gradient text-primary-foreground">
                 <Flame className="h-5 w-5" />
               </span>
               <span className="font-extrabold text-lg">

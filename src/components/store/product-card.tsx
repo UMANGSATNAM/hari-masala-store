@@ -28,12 +28,13 @@ export function ProductCard({ product }: { product: Product }) {
     <div className="group relative flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5">
       {/* Image */}
       <div className="relative aspect-square overflow-hidden bg-muted">
-        { }
         <img
           src={product.image}
           alt={product.name}
           loading="lazy"
-          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          className={`h-full w-full object-cover transition-transform duration-300 group-hover:scale-105 ${
+            product.image === '/placeholder.svg' ? 'p-6 opacity-70' : ''
+          }`}
         />
         <div className="absolute left-2 top-2 flex flex-col gap-1.5">
           {product.featured && (
@@ -42,7 +43,7 @@ export function ProductCard({ product }: { product: Product }) {
             </Badge>
           )}
           {discount > 0 && (
-            <Badge className="bg-spice-gradient text-primary-foreground shadow text-[10px] px-2 py-0.5">
+            <Badge className="bg-primary-gradient text-primary-foreground shadow text-[10px] px-2 py-0.5">
               {discount}% OFF
             </Badge>
           )}
@@ -104,7 +105,7 @@ export function ProductCard({ product }: { product: Product }) {
             className={`h-9 px-3 transition-all ${
               added
                 ? 'bg-green-600 hover:bg-green-600 text-white'
-                : 'bg-spice-gradient hover:opacity-90'
+                : 'bg-primary-gradient hover:opacity-90'
             }`}
           >
             {added ? (

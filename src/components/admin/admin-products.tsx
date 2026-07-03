@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import {
-  Plus, Pencil, Trash2, Search, Loader2, Star, StarOff, PackageX, IndianRupee,
+  Plus, Pencil, Trash2, Search, Loader2, Star, StarOff, PackageX, IndianRupee, Upload,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -47,6 +47,30 @@ export function AdminProducts({ categories }: { categories: Category[] }) {
   const [saving, setSaving] = useState(false)
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [priceEdit, setPriceEdit] = useState<{ id: string; value: string } | null>(null)
+  const [uploading, setUploading] = useState(false)
+
+  // Handle image file upload
+  const handleImageUpload = async (file: File) => {
+    if (!file) return
+    setUploading(true)
+    try {
+      const fd = new FormData()
+      fd.append('file', file)
+      const res = await fetch('/api/upload', { method: 'POST', body: fd })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error((err as { error?: string }).error || 'Upload failed')
+      }
+      const data = (await res.json()) as { url: string }
+      setForm((f) => ({ ...f, image: data.url }))
+      toast.success('Image uploaded')
+    } catch (e) {
+      console.error(e)
+      toast.error(e instanceof Error ? e.message : 'Upload failed')
+    } finally {
+      setUploading(false)
+    }
+  }
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -195,7 +219,7 @@ export function AdminProducts({ categories }: { categories: Category[] }) {
             Manage your spice catalog — edit prices, stock & details
           </p>
         </div>
-        <Button onClick={openCreate} className="bg-spice-gradient hover:opacity-90">
+        <Button onClick={openCreate} className="bg-primary-gradient hover:opacity-90">
           <Plus className="h-4 w-4 mr-1.5" /> Add Product
         </Button>
       </div>
@@ -380,12 +404,39 @@ export function AdminProducts({ categories }: { categories: Category[] }) {
 
           <div className="grid gap-3">
             {form.image && (
-               
               <img src={form.image} alt="preview" className="h-32 w-full object-cover rounded-lg border border-border" />
             )}
             <div className="grid gap-1.5">
-              <Label>Image URL *</Label>
-              <Input value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value })} placeholder="https://…" />
+              <Label>Product Image *</Label>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Input
+                  value={form.image}
+                  onChange={(e) => setForm({ ...form, image: e.target.value })}
+                  placeholder="Paste image URL or upload below…"
+                  className="flex-1"
+                />
+                <label className="inline-flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap rounded-md bg-primary-gradient text-primary-foreground hover:opacity-90 h-9 px-3 text-sm font-medium">
+                  {uploading ? (
+                    <><Loader2 className="h-4 w-4 animate-spin" /> Uploading…</>
+                  ) : (
+                    <><Upload className="h-4 w-4" /> Upload Image</>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    className="hidden"
+                    disabled={uploading}
+                    onChange={(e) => {
+                      const f = e.target.files?.[0]
+                      if (f) handleImageUpload(f)
+                      e.target.value = ''
+                    }}
+                  />
+                </label>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Upload a product photo (JPG/PNG/WEBP, max 5MB) or paste an image URL.
+              </p>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="grid gap-1.5">
@@ -450,7 +501,7 @@ export function AdminProducts({ categories }: { categories: Category[] }) {
 
           <DialogFooter className="gap-2">
             <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
-            <Button onClick={save} disabled={saving} className="bg-spice-gradient hover:opacity-90">
+            <Button onClick={save} disabled={saving} className="bg-primary-gradient hover:opacity-90">
               {saving ? <Loader2 className="h-4 w-4 mr-1.5 animate-spin" /> : null}
               {editing ? 'Save Changes' : 'Create Product'}
             </Button>

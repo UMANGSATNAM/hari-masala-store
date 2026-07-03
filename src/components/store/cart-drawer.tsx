@@ -30,7 +30,7 @@ export function CartDrawer({
   return (
     <Sheet open={isOpen} onOpenChange={setOpen}>
       <SheetContent className="w-full sm:max-w-md flex flex-col p-0 gap-0">
-        <SheetHeader className="px-4 py-4 border-b border-border bg-spice-gradient text-primary-foreground">
+        <SheetHeader className="px-4 py-4 border-b border-border bg-primary-gradient text-primary-foreground">
           <div className="flex items-center justify-between">
             <SheetTitle className="flex items-center gap-2 text-primary-foreground">
               <ShoppingBag className="h-5 w-5" /> Your Cart
@@ -82,7 +82,7 @@ export function CartDrawer({
               </p>
               <Button
                 onClick={() => setOpen(false)}
-                className="mt-5 bg-spice-gradient hover:opacity-90"
+                className="mt-5 bg-primary-gradient hover:opacity-90"
               >
                 Continue Shopping
               </Button>
@@ -176,7 +176,7 @@ export function CartDrawer({
               </Button>
               <Button
                 onClick={onCheckout}
-                className="flex-1 bg-spice-gradient hover:opacity-90 h-11"
+                className="flex-1 bg-primary-gradient hover:opacity-90 h-11"
               >
                 <ShoppingBag className="h-4 w-4 mr-2" /> Checkout via WhatsApp
               </Button>

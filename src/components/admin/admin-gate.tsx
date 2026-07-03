@@ -44,7 +44,7 @@ export function AdminGate({ onExit }: { onExit: () => void }) {
         </button>
         <div className="rounded-2xl border border-border bg-card p-7 shadow-lg">
           <div className="flex flex-col items-center text-center mb-6">
-            <span className="grid place-items-center h-14 w-14 rounded-full bg-spice-gradient text-primary-foreground mb-3 shadow">
+            <span className="grid place-items-center h-14 w-14 rounded-full bg-primary-gradient text-primary-foreground mb-3 shadow">
               <Flame className="h-7 w-7" />
             </span>
             <h1 className="text-xl font-bold text-foreground">Hari Masala Admin</h1>
@@ -72,7 +72,7 @@ export function AdminGate({ onExit }: { onExit: () => void }) {
             <Button
               type="submit"
               disabled={loading || !pin}
-              className="w-full bg-spice-gradient hover:opacity-90 h-11"
+              className="w-full bg-primary-gradient hover:opacity-90 h-11"
             >
               {loading ? (
                 <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Verifying…</>

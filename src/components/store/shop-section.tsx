@@ -52,7 +52,7 @@ export function ShopSection({
               onClick={() => onCategoryChange(c.slug)}
               className={`shrink-0 inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors ${
                 active
-                  ? 'bg-spice-gradient text-primary-foreground border-transparent shadow-sm'
+                  ? 'bg-primary-gradient text-primary-foreground border-transparent shadow-sm'
                   : 'bg-card text-muted-foreground border-border hover:border-primary hover:text-primary'
               }`}
             >

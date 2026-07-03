@@ -50,7 +50,7 @@ export function AdminApp({
             >
               <Menu className="h-5 w-5" />
             </button>
-            <span className="grid place-items-center h-8 w-8 rounded-full bg-spice-gradient text-primary-foreground">
+            <span className="grid place-items-center h-8 w-8 rounded-full bg-primary-gradient text-primary-foreground">
               <Flame className="h-4 w-4" />
             </span>
             <span className="font-bold text-foreground hidden sm:inline">Hari Masala</span>
@@ -79,7 +79,7 @@ export function AdminApp({
                 onClick={() => setTab(n.id)}
                 className={`w-full flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                   tab === n.id
-                    ? 'bg-spice-gradient text-primary-foreground shadow-sm'
+                    ? 'bg-primary-gradient text-primary-foreground shadow-sm'
                     : 'text-muted-foreground hover:bg-accent hover:text-foreground'
                 }`}
               >
@@ -102,7 +102,7 @@ export function AdminApp({
                   onClick={() => { setTab(n.id); setMobileNav(false) }}
                   className={`w-full flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium ${
                     tab === n.id
-                      ? 'bg-spice-gradient text-primary-foreground'
+                      ? 'bg-primary-gradient text-primary-foreground'
                       : 'text-muted-foreground hover:bg-accent'
                   }`}
                 >
