@@ -49,14 +49,14 @@ export function AdminProducts({ categories }: { categories: Category[] }) {
   const [priceEdit, setPriceEdit] = useState<{ id: string; value: string } | null>(null)
   const [uploading, setUploading] = useState(false)
 
-  // Handle image file upload
+  // Handle image file upload — POSTs to /api/products which handles multipart uploads
   const handleImageUpload = async (file: File) => {
     if (!file) return
     setUploading(true)
     try {
       const fd = new FormData()
       fd.append('file', file)
-      const res = await fetch('/api/upload', { method: 'POST', body: fd })
+      const res = await fetch('/api/products', { method: 'POST', body: fd })
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
         throw new Error((err as { error?: string }).error || 'Upload failed')

@@ -1,6 +1,37 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { slugify } from '@/lib/format'
+import { writeFile, mkdir } from 'fs/promises'
+import path from 'path'
+import { randomUUID } from 'crypto'
+
+// Handle image upload when Content-Type is multipart/form-data
+async function handleUpload(req: NextRequest) {
+  try {
+    const formData = await req.formData()
+    const file = formData.get('file') as File | null
+    if (!file) {
+      return NextResponse.json({ error: 'No file provided' }, { status: 400 })
+    }
+    const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/jpg']
+    if (!allowed.includes(file.type)) {
+      return NextResponse.json({ error: 'Only JPG, PNG, WEBP, GIF allowed' }, { status: 400 })
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      return NextResponse.json({ error: 'File too large (max 5MB)' }, { status: 400 })
+    }
+    const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg'
+    const filename = `${randomUUID()}.${ext}`
+    const uploadDir = path.join(process.cwd(), 'public', 'uploads')
+    await mkdir(uploadDir, { recursive: true })
+    const bytes = await file.arrayBuffer()
+    await writeFile(path.join(uploadDir, filename), Buffer.from(bytes))
+    return NextResponse.json({ url: `/uploads/${filename}`, filename })
+  } catch (e) {
+    console.error('Upload error:', e)
+    return NextResponse.json({ error: 'Upload failed' }, { status: 500 })
+  }
+}
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
@@ -33,6 +64,11 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  // Detect image upload (multipart/form-data) vs product create (application/json)
+  const contentType = req.headers.get('content-type') || ''
+  if (contentType.includes('multipart/form-data')) {
+    return handleUpload(req)
+  }
   try {
     const body = await req.json()
     const {
