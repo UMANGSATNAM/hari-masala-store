@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { Flame, MessageCircle, Phone, MapPin, Mail, Lock } from 'lucide-react'
 import type { Settings } from '@/lib/types'
 
@@ -44,10 +45,11 @@ export function StoreFooter({
           <div>
             <h4 className="font-semibold mb-3">Quick Links</h4>
             <ul className="space-y-2 text-sm text-background/70">
-              <li><a href="#home" className="hover:text-saffron">Home</a></li>
-              <li><a href="#shop" className="hover:text-saffron">Shop Spices</a></li>
-              <li><a href="#categories" className="hover:text-saffron">Categories</a></li>
-              <li><a href="#features" className="hover:text-saffron">Why Us</a></li>
+              <li><Link href="/" className="hover:text-saffron">Home</Link></li>
+              <li><Link href="/#shop" className="hover:text-saffron">Shop Spices</Link></li>
+              <li><Link href="/#categories" className="hover:text-saffron">Categories</Link></li>
+              <li><Link href="/about" className="hover:text-saffron">About Us</Link></li>
+              <li><Link href="/#features" className="hover:text-saffron">Why Us</Link></li>
             </ul>
           </div>
 
@@ -55,10 +57,10 @@ export function StoreFooter({
           <div>
             <h4 className="font-semibold mb-3">Shop By Category</h4>
             <ul className="space-y-2 text-sm text-background/70">
-              <li><a href="#shop" className="hover:text-saffron">Powder Spices</a></li>
-              <li><a href="#shop" className="hover:text-saffron">Whole Spices</a></li>
-              <li><a href="#shop" className="hover:text-saffron">Blended Masalas</a></li>
-              <li><a href="#shop" className="hover:text-saffron">Premium Spices</a></li>
+              <li><Link href="/#shop" className="hover:text-saffron">Powder Spices</Link></li>
+              <li><Link href="/#shop" className="hover:text-saffron">Whole Spices</Link></li>
+              <li><Link href="/#shop" className="hover:text-saffron">Blended Masalas</Link></li>
+              <li><Link href="/#shop" className="hover:text-saffron">Premium Spices</Link></li>
             </ul>
           </div>
 

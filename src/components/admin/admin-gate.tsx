@@ -83,7 +83,7 @@ export function AdminGate({ onExit }: { onExit: () => void }) {
           </form>
 
           <p className="mt-4 text-center text-xs text-muted-foreground">
-            Demo PIN: <span className="font-mono font-semibold text-foreground">1234</span>
+            Protected by Hari Masala Secure Access
           </p>
         </div>
       </div>

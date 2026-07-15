@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { Flame, Search, ShoppingCart, Menu, X, Headphones } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
@@ -21,11 +22,12 @@ export function StoreHeader({
   const [menuOpen, setMenuOpen] = useState(false)
 
   const navLinks = [
-    { label: 'Home', href: '#home' },
-    { label: 'Shop', href: '#shop' },
-    { label: 'Categories', href: '#categories' },
-    { label: 'Why Us', href: '#features' },
-    { label: 'Contact', href: '#contact' },
+    { label: 'Home', href: '/' },
+    { label: 'Shop Spices', href: '/#shop' },
+    { label: 'Categories', href: '/#categories' },
+    { label: 'About Us', href: '/about' },
+    { label: 'Why Us', href: '/#features' },
+    { label: 'Contact', href: '/#contact' },
   ]
 
   return (
@@ -41,7 +43,7 @@ export function StoreHeader({
         {/* Main header row */}
         <div className="flex h-16 items-center gap-3">
           {/* Logo */}
-          <a href="#home" className="flex items-center gap-2 shrink-0">
+          <Link href="/" className="flex items-center gap-2 shrink-0">
             <span className="grid place-items-center h-9 w-9 rounded-full bg-primary-gradient text-primary-foreground shadow-sm">
               <Flame className="h-5 w-5" />
             </span>
@@ -53,7 +55,7 @@ export function StoreHeader({
                 Pure & Authentic Spices
               </span>
             </span>
-          </a>
+          </Link>
 
           {/* Search bar (desktop, centered) */}
           <div className="hidden md:flex flex-1 max-w-xl mx-auto">
@@ -149,13 +151,13 @@ export function StoreHeader({
         {/* Nav row (desktop) */}
         <nav className="hidden md:flex items-center gap-1 h-11 -mt-1">
           {navLinks.map((l) => (
-            <a
+            <Link
               key={l.href}
               href={l.href}
               className="px-3 py-1.5 text-sm font-medium text-foreground/80 hover:text-primary hover:bg-accent/60 rounded-md transition-colors"
             >
               {l.label}
-            </a>
+            </Link>
           ))}
           <span className="ml-auto text-xs text-muted-foreground">
             Order on WhatsApp · Cash on Delivery
@@ -167,14 +169,14 @@ export function StoreHeader({
       {menuOpen && (
         <nav className="md:hidden border-t border-border bg-white px-4 py-3 flex flex-col gap-1">
           {navLinks.map((l) => (
-            <a
+            <Link
               key={l.href}
               href={l.href}
               onClick={() => setMenuOpen(false)}
               className="px-3 py-2 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/60 rounded-md"
             >
               {l.label}
-            </a>
+            </Link>
           ))}
         </nav>
       )}

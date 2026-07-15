@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { Plus, Star, Check } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
@@ -15,7 +16,9 @@ export function ProductCard({ product }: { product: Product }) {
   const discount = discountPercent(product.mrp, product.price)
   const outOfStock = product.stock <= 0
 
-  const handleAdd = () => {
+  const handleAdd = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
     if (outOfStock) return
     add(product, 1)
     setAdded(true)
@@ -27,7 +30,7 @@ export function ProductCard({ product }: { product: Product }) {
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5">
       {/* Image */}
-      <div className="relative aspect-square overflow-hidden bg-muted">
+      <Link href={`/product/${product.slug}`} className="relative aspect-square overflow-hidden bg-muted block">
         <img
           src={product.image}
           alt={product.name}
@@ -55,19 +58,19 @@ export function ProductCard({ product }: { product: Product }) {
             </span>
           </div>
         )}
-      </div>
+      </Link>
 
       {/* Body */}
       <div className="flex flex-1 flex-col p-3 sm:p-4">
         <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0">
+          <Link href={`/product/${product.slug}`} className="min-w-0 hover:text-primary transition-colors">
             {product.gujaratiName && (
               <h3 className="font-semibold text-sm sm:text-base text-foreground truncate leading-tight" lang="gu">
                 {product.gujaratiName}
               </h3>
             )}
             <p className="text-xs text-muted-foreground truncate">{product.name}</p>
-          </div>
+          </Link>
           <div className="flex items-center gap-0.5 shrink-0 text-amber-500">
             <Star className="h-3.5 w-3.5 fill-current" />
             <span className="text-xs font-medium text-foreground">

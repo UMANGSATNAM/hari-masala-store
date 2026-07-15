@@ -20,6 +20,9 @@ export const api = {
     if (params.featured) q.set('featured', 'true')
     return jfetch<{ products: Product[] }>(`/api/products?${q.toString()}`)
   },
+  getProductBySlug: (slug: string) =>
+    jfetch<{ product: Product; relatedProducts: Product[] }>(`/api/products/slug/${encodeURIComponent(slug)}`),
+
   createProduct: (data: Partial<Product>) =>
     jfetch<{ product: Product }>(`/api/products`, { method: 'POST', body: JSON.stringify(data) }),
   updateProduct: (id: string, data: Partial<Product>) =>

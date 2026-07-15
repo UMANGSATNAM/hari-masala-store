@@ -9,6 +9,7 @@ import { FeaturesSection } from './features-section'
 import { StoreFooter } from './store-footer'
 import { CartDrawer } from './cart-drawer'
 import { CheckoutDialog } from './checkout-dialog'
+import { WhatsAppFloatingButton } from './whatsapp-floating-button'
 import type { Category, Product, Settings } from '@/lib/types'
 
 export function Storefront({
@@ -58,6 +59,7 @@ export function Storefront({
 
       <CartDrawer settings={settings} onCheckout={() => setCheckoutOpen(true)} />
       <CheckoutDialog open={checkoutOpen} onOpenChange={setCheckoutOpen} settings={settings} />
+      <WhatsAppFloatingButton settings={settings} />
     </div>
   )
 }
