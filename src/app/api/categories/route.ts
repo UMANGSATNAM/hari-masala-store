@@ -3,11 +3,16 @@ import { db } from '@/lib/db'
 import { slugify } from '@/lib/format'
 
 export async function GET() {
-  const categories = await db.category.findMany({
-    orderBy: { sortOrder: 'asc' },
-    include: { _count: { select: { products: true } } },
-  })
-  return NextResponse.json({ categories })
+  try {
+    const categories = await db.category.findMany({
+      orderBy: { sortOrder: 'asc' },
+      include: { _count: { select: { products: true } } },
+    })
+    return NextResponse.json({ categories })
+  } catch (e) {
+    console.error('GET /api/categories error:', e)
+    return NextResponse.json({ categories: [] })
+  }
 }
 
 export async function POST(req: NextRequest) {

@@ -24,11 +24,32 @@ export default function Home() {
   useEffect(() => {
     Promise.all([api.getSettings(), api.getCategories(), api.getProducts({ category: 'all' })])
       .then(([s, c, p]) => {
-        setSettings(s.settings)
-        setCategories(c.categories)
-        setProducts(p.products)
+        setSettings(s?.settings || {
+          id: 'default',
+          storeName: 'Hari Masala',
+          storeTagline: 'Pure & Authentic Indian Spices',
+          whatsappNumber: '919879873113',
+          freeShipThreshold: 499,
+          adminPin: '',
+          heroImage: null,
+          announcement: null,
+        })
+        setCategories(c?.categories || [])
+        setProducts(p?.products || [])
       })
-      .catch((e) => console.error('Load error:', e))
+      .catch((e) => {
+        console.error('Load error:', e)
+        setSettings({
+          id: 'default',
+          storeName: 'Hari Masala',
+          storeTagline: 'Pure & Authentic Indian Spices',
+          whatsappNumber: '919879873113',
+          freeShipThreshold: 499,
+          adminPin: '',
+          heroImage: null,
+          announcement: null,
+        })
+      })
       .finally(() => setLoading(false))
   }, [])
 

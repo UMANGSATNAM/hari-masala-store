@@ -2,8 +2,26 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 
 export async function GET() {
-  const settings = await db.settings.findUnique({ where: { id: 'default' } })
-  if (!settings) {
+  try {
+    const settings = await db.settings.findUnique({ where: { id: 'default' } })
+    if (!settings) {
+      return NextResponse.json({
+        settings: {
+          id: 'default',
+          storeName: 'Hari Masala',
+          storeTagline: 'Pure & Authentic Indian Spices',
+          whatsappNumber: '919879873113',
+          freeShipThreshold: 499,
+          adminPin: '',
+          heroImage: null,
+          announcement: null,
+        },
+      })
+    }
+    // Never expose the admin pin to the client
+    return NextResponse.json({ settings: { ...settings, adminPin: '' } })
+  } catch (e) {
+    console.error('GET /api/settings database error:', e)
     return NextResponse.json({
       settings: {
         id: 'default',
@@ -17,8 +35,6 @@ export async function GET() {
       },
     })
   }
-  // Never expose the admin pin to the client
-  return NextResponse.json({ settings: { ...settings, adminPin: '' } })
 }
 
 export async function PUT(req: NextRequest) {

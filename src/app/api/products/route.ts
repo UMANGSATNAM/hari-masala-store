@@ -54,13 +54,17 @@ export async function GET(req: NextRequest) {
     ]
   }
 
-  const products = await db.product.findMany({
-    where,
-    include: { category: true },
-    orderBy: [{ featured: 'desc' }, { createdAt: 'desc' }],
-  })
-
-  return NextResponse.json({ products })
+  try {
+    const products = await db.product.findMany({
+      where,
+      include: { category: true },
+      orderBy: [{ featured: 'desc' }, { createdAt: 'desc' }],
+    })
+    return NextResponse.json({ products })
+  } catch (e) {
+    console.error('GET /api/products error:', e)
+    return NextResponse.json({ products: [] })
+  }
 }
 
 export async function POST(req: NextRequest) {
