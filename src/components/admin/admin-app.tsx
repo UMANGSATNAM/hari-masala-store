@@ -3,21 +3,23 @@
 import { useState } from 'react'
 import {
   LayoutDashboard, Package, ShoppingCart, Settings as SettingsIcon,
-  LogOut, Store, Flame, Menu,
+  LogOut, Store, Flame, Menu, FolderTree,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useAdmin } from '@/lib/store'
 import { AdminDashboard } from './admin-dashboard'
 import { AdminProducts } from './admin-products'
+import { AdminCategories } from './admin-categories'
 import { AdminOrders } from './admin-orders'
 import { AdminSettings } from './admin-settings'
 import type { Category, Settings } from '@/lib/types'
 
-type Tab = 'dashboard' | 'products' | 'orders' | 'settings'
+type Tab = 'dashboard' | 'products' | 'categories' | 'orders' | 'settings'
 
 const NAV: { id: Tab; label: string; icon: typeof LayoutDashboard }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { id: 'products', label: 'Products', icon: Package },
+  { id: 'categories', label: 'Categories', icon: FolderTree },
   { id: 'orders', label: 'Orders', icon: ShoppingCart },
   { id: 'settings', label: 'Settings', icon: SettingsIcon },
 ]
@@ -27,11 +29,13 @@ export function AdminApp({
   categories,
   onExit,
   onSettingsSaved,
+  onCategoriesChanged,
 }: {
   settings: Settings
   categories: Category[]
   onExit: () => void
   onSettingsSaved: (s: Settings) => void
+  onCategoriesChanged?: (c: Category[]) => void
 }) {
   const logout = useAdmin((s) => s.logout)
   const [tab, setTab] = useState<Tab>('dashboard')
@@ -117,7 +121,8 @@ export function AdminApp({
         <main className="flex-1 p-4 sm:p-6 overflow-x-hidden">
           <div className="mx-auto max-w-6xl">
             {tab === 'dashboard' && <AdminDashboard onGoOrders={() => setTab('orders')} />}
-            {tab === 'products' && <AdminProducts categories={categories} />}
+            {tab === 'products' && <AdminProducts categories={categories} onCategoryAdded={(c) => onCategoriesChanged?.([...categories, c])} />}
+            {tab === 'categories' && <AdminCategories categories={categories} onUpdate={(cats) => onCategoriesChanged?.(cats)} />}
             {tab === 'orders' && <AdminOrders settings={settings} />}
             {tab === 'settings' && <AdminSettings settings={settings} onSaved={onSettingsSaved} />}
           </div>

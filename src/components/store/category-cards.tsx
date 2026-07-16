@@ -1,6 +1,7 @@
 'use client'
 
 import { ArrowRight } from 'lucide-react'
+import { CategorySvgIcon } from '@/components/ui/category-svg-icon'
 import type { Category, Product } from '@/lib/types'
 
 const CAT_COLORS: Record<string, string> = {
@@ -46,26 +47,34 @@ export function CategoryCards({
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
-          {cards.map((c) => (
-            <button
-              key={c.id}
-              onClick={() => onSelect(c.slug)}
-              className="group relative overflow-hidden rounded-xl border border-border bg-white p-4 text-left shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5"
-            >
-              <div
-                className={`grid place-items-center h-14 w-14 sm:h-16 sm:w-16 rounded-full ${
-                  CAT_COLORS[c.slug] || 'bg-mint-gradient'
-                } mb-3`}
+          {cards.map((c) => {
+            const isDark = CAT_COLORS[c.slug] === 'bg-primary-gradient'
+            return (
+              <button
+                key={c.id}
+                onClick={() => onSelect(c.slug)}
+                className="group relative overflow-hidden rounded-xl border border-border bg-white p-4 text-left shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5"
               >
-                <span className="text-2xl sm:text-3xl">{c.icon}</span>
-              </div>
-              <h3 className="font-semibold text-sm text-foreground leading-tight">{c.name}</h3>
-              <p className="text-xs text-muted-foreground mt-0.5">{countFor(c.slug)} products</p>
-              <span className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-primary group-hover:gap-1.5 transition-all">
-                Shop Collection <ArrowRight className="h-3 w-3" />
-              </span>
-            </button>
-          ))}
+                <div
+                  className={`grid place-items-center h-14 w-14 sm:h-16 sm:w-16 rounded-full ${
+                    CAT_COLORS[c.slug] || 'bg-mint-gradient'
+                  } mb-3 shadow-inner`}
+                >
+                  <CategorySvgIcon
+                    category={c}
+                    className={`h-7 w-7 sm:h-8 sm:w-8 stroke-[2.2] transition-transform group-hover:scale-110 ${
+                      isDark ? 'text-white' : 'text-primary'
+                    }`}
+                  />
+                </div>
+                <h3 className="font-semibold text-sm text-foreground leading-tight">{c.name}</h3>
+                <p className="text-xs text-muted-foreground mt-0.5">{countFor(c.slug)} products</p>
+                <span className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-primary group-hover:gap-1.5 transition-all">
+                  Shop Collection <ArrowRight className="h-3 w-3" />
+                </span>
+              </button>
+            )
+          })}
         </div>
       </div>
     </section>

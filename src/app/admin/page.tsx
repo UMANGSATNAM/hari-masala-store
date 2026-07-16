@@ -51,6 +51,7 @@ export default function AdminRoutePage() {
       categories={categories}
       onExit={goToStore}
       onSettingsSaved={(s) => setSettings(s)}
+      onCategoriesChanged={(cats) => setCategories(cats)}
     />
   )
 }

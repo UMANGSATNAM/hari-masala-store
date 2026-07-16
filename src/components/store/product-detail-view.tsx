@@ -15,7 +15,9 @@ import {
   MessageCircle,
   Sparkles,
   HeartHandshake,
-  ChevronDown
+  ChevronDown,
+  Zap,
+  Utensils
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -267,7 +269,7 @@ export function ProductDetailView({
                 disabled={outOfStock}
                 className="h-13 bg-amber-600 hover:bg-amber-700 text-white text-base font-bold shadow-md"
               >
-                ⚡ Buy Now (Instant Checkout)
+                <span className="inline-flex items-center gap-1.5"><Zap className="h-4 w-4 fill-current shrink-0" /> Buy Now (Instant Checkout)</span>
               </Button>
             </div>
 
@@ -310,7 +312,7 @@ export function ProductDetailView({
                   : 'border-transparent text-muted-foreground hover:text-foreground'
               }`}
             >
-              🛡️ Why Hari Masala is Better?
+              <span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 shrink-0" /> Why Hari Masala is Better?</span>
             </button>
             <button
               onClick={() => setActiveTab('recipes')}
@@ -320,7 +322,7 @@ export function ProductDetailView({
                   : 'border-transparent text-muted-foreground hover:text-foreground'
               }`}
             >
-              🍲 Traditional Usage & Tips
+              <span className="inline-flex items-center gap-2"><Utensils className="h-4 w-4 shrink-0" /> Traditional Usage & Tips</span>
             </button>
             <button
               onClick={() => setActiveTab('reviews')}
@@ -330,7 +332,7 @@ export function ProductDetailView({
                   : 'border-transparent text-muted-foreground hover:text-foreground'
               }`}
             >
-              ⭐ Customer Reviews (142+)
+              <span className="inline-flex items-center gap-2"><Star className="h-4 w-4 fill-amber-500 text-amber-500 shrink-0" /> Customer Reviews (142+)</span>
             </button>
           </div>
 
@@ -504,7 +506,7 @@ export function ProductDetailView({
             disabled={outOfStock}
             className="h-10 px-4 bg-amber-600 hover:bg-amber-700 text-white font-bold"
           >
-            ⚡ Buy Now
+            <span className="inline-flex items-center gap-1.5"><Zap className="h-4 w-4 fill-current shrink-0" /> Buy Now</span>
           </Button>
         </div>
       </div>

@@ -58,15 +58,15 @@ const IMG = {
 }
 
 const categories = [
-  { name: 'Mukhvas', slug: 'mukhvas', icon: '🍬', sortOrder: 1 },
-  { name: 'Masala & Powders', slug: 'masala-powders', icon: '🟡', sortOrder: 2 },
-  { name: 'Chilli', slug: 'chilli', icon: '🌶️', sortOrder: 3 },
-  { name: 'Hing', slug: 'hing', icon: '🟤', sortOrder: 4 },
-  { name: 'Whole Spices', slug: 'whole-spices', icon: '🫘', sortOrder: 5 },
-  { name: 'Seeds & Dry Fruits', slug: 'seeds-dry-fruits', icon: '🥜', sortOrder: 6 },
-  { name: 'Fruit Bars', slug: 'fruit-bars', icon: '🍓', sortOrder: 7 },
-  { name: 'Farali & Instant Mix', slug: 'farali-instant', icon: '🍚', sortOrder: 8 },
-  { name: 'Ayurvedic', slug: 'ayurvedic', icon: '🌿', sortOrder: 9 },
+  { name: 'Mukhvas', slug: 'mukhvas', icon: 'mukhvas', sortOrder: 1 },
+  { name: 'Masala & Powders', slug: 'masala-powders', icon: 'masala', sortOrder: 2 },
+  { name: 'Chilli', slug: 'chilli', icon: 'chilli', sortOrder: 3 },
+  { name: 'Hing', slug: 'hing', icon: 'hing', sortOrder: 4 },
+  { name: 'Whole Spices', slug: 'whole-spices', icon: 'whole-spices', sortOrder: 5 },
+  { name: 'Seeds & Dry Fruits', slug: 'seeds-dry-fruits', icon: 'seeds', sortOrder: 6 },
+  { name: 'Fruit Bars', slug: 'fruit-bars', icon: 'fruits', sortOrder: 7 },
+  { name: 'Farali & Instant Mix', slug: 'farali-instant', icon: 'farali', sortOrder: 8 },
+  { name: 'Ayurvedic', slug: 'ayurvedic', icon: 'ayurvedic', sortOrder: 9 },
 ]
 
 type P = {

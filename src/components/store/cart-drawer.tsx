@@ -1,6 +1,6 @@
 'use client'
 
-import { Minus, Plus, Trash2, ShoppingBag, X, Truck } from 'lucide-react'
+import { Minus, Plus, Trash2, ShoppingBag, X, Truck, Sparkles } from 'lucide-react'
 import {
   Sheet,
   SheetContent,
@@ -55,8 +55,8 @@ export function CartDrawer({
                   Add <strong>{formatINR(remaining)}</strong> more for FREE delivery
                 </span>
               ) : (
-                <span className="font-semibold text-green-700">
-                  🎉 You&apos;ve unlocked FREE delivery!
+                <span className="inline-flex items-center gap-1 font-semibold text-green-700">
+                  <Sparkles className="h-3.5 w-3.5 text-primary shrink-0 animate-pulse" /> You&apos;ve unlocked FREE delivery!
                 </span>
               )}
             </div>

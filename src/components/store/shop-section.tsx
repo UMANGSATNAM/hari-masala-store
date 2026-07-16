@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 import { SlidersHorizontal, SearchX } from 'lucide-react'
 import { ProductCard } from './product-card'
 import { Skeleton } from '@/components/ui/skeleton'
+import { CategorySvgIcon } from '@/components/ui/category-svg-icon'
 import type { Category, Product } from '@/lib/types'
 
 export function ShopSection({
@@ -22,7 +23,7 @@ export function ShopSection({
   search: string
 }) {
   const pills = useMemo(
-    () => [{ id: 'all', name: 'All Spices', slug: 'all', icon: '🛍️', sortOrder: 0 }, ...categories],
+    () => [{ id: 'all', name: 'All Spices', slug: 'all', icon: 'all', sortOrder: 0 }, ...categories],
     [categories]
   )
 
@@ -56,7 +57,7 @@ export function ShopSection({
                   : 'bg-card text-muted-foreground border-border hover:border-primary hover:text-primary'
               }`}
             >
-              {c.icon && <span>{c.icon}</span>}
+              <CategorySvgIcon category={c} className="h-4 w-4 shrink-0" />
               {c.name}
             </button>
           )

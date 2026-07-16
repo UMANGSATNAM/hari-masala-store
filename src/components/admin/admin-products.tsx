@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { api } from '@/lib/api-client'
 import { formatINR, discountPercent } from '@/lib/format'
+import { CategorySvgIcon, COMMON_SVG_ICONS } from '@/components/ui/category-svg-icon'
 import type { Category, Product } from '@/lib/types'
 import { toast } from 'sonner'
 
@@ -37,7 +38,7 @@ const emptyForm: FormState = {
   categoryId: '', image: '', stock: '50', featured: false, active: true, rating: '4.5',
 }
 
-export function AdminProducts({ categories }: { categories: Category[] }) {
+export function AdminProducts({ categories, onCategoryAdded }: { categories: Category[]; onCategoryAdded?: (cat: Category) => void }) {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -48,6 +49,35 @@ export function AdminProducts({ categories }: { categories: Category[] }) {
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [priceEdit, setPriceEdit] = useState<{ id: string; value: string } | null>(null)
   const [uploading, setUploading] = useState(false)
+
+  const [quickCatOpen, setQuickCatOpen] = useState(false)
+  const [quickCatName, setQuickCatName] = useState('')
+  const [quickCatIcon, setQuickCatIcon] = useState('chilli')
+  const [quickCatSaving, setQuickCatSaving] = useState(false)
+
+  const handleQuickCreateCategory = async () => {
+    if (!quickCatName.trim()) {
+      toast.error('Category name is required')
+      return
+    }
+    setQuickCatSaving(true)
+    try {
+      const { category } = await api.createCategory({
+        name: quickCatName.trim(),
+        icon: quickCatIcon || 'chilli',
+        sortOrder: categories.length + 1,
+      })
+      onCategoryAdded?.(category)
+      setForm((f) => ({ ...f, categoryId: category.id }))
+      toast.success(`Category "${category.name}" created and selected!`)
+      setQuickCatOpen(false)
+      setQuickCatName('')
+    } catch (e: any) {
+      toast.error(e?.message || 'Failed to create category')
+    } finally {
+      setQuickCatSaving(false)
+    }
+  }
 
   // Handle image file upload — POSTs to /api/products which handles multipart uploads
   const handleImageUpload = async (file: File) => {
@@ -477,12 +507,26 @@ export function AdminProducts({ categories }: { categories: Category[] }) {
               </div>
             </div>
             <div className="grid gap-1.5">
-              <Label>Category *</Label>
+              <div className="flex items-center justify-between">
+                <Label>Category *</Label>
+                <button
+                  type="button"
+                  onClick={() => { setQuickCatName(''); setQuickCatOpen(true) }}
+                  className="text-xs font-semibold text-primary hover:underline flex items-center gap-1"
+                >
+                  <Plus className="h-3 w-3" /> New Category
+                </button>
+              </div>
               <Select value={form.categoryId} onValueChange={(v) => setForm({ ...form, categoryId: v })}>
                 <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
                 <SelectContent>
                   {categories.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>{c.icon} {c.name}</SelectItem>
+                    <SelectItem key={c.id} value={c.id}>
+                      <span className="flex items-center gap-2">
+                        <CategorySvgIcon category={c} className="h-4 w-4 text-primary shrink-0" />
+                        {c.name}
+                      </span>
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -526,6 +570,67 @@ export function AdminProducts({ categories }: { categories: Category[] }) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Quick category creation modal inside product form */}
+      <Dialog open={quickCatOpen} onOpenChange={setQuickCatOpen}>
+        <DialogContent className="max-w-sm z-50">
+          <DialogHeader>
+            <DialogTitle>Add New Category</DialogTitle>
+            <DialogDescription>
+              Create a category quickly without leaving your product form.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-3 py-2">
+            <div className="grid gap-1.5">
+              <Label>Category Name *</Label>
+              <Input
+                value={quickCatName}
+                onChange={(e) => setQuickCatName(e.target.value)}
+                placeholder="e.g. Blended Masalas"
+                autoFocus
+                onKeyDown={(e) => { if (e.key === 'Enter') handleQuickCreateCategory() }}
+              />
+            </div>
+            <div className="grid gap-1.5">
+              <Label>Icon (Vector Key)</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  value={quickCatIcon}
+                  onChange={(e) => setQuickCatIcon(e.target.value)}
+                  placeholder="chilli"
+                  className="w-28 font-mono text-xs"
+                />
+                <span className="text-xs text-muted-foreground">Pick:</span>
+              </div>
+              <div className="flex flex-wrap gap-1 pt-1">
+                {COMMON_SVG_ICONS.slice(0, 6).map((item) => {
+                  const IconComp = item.icon
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => setQuickCatIcon(item.id)}
+                      className={`p-1.5 rounded border transition-colors ${
+                        quickCatIcon === item.id ? 'border-primary bg-primary/10 text-primary' : 'border-border text-muted-foreground hover:bg-accent'
+                      }`}
+                      title={item.label}
+                    >
+                      <IconComp className="h-4 w-4" />
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" size="sm" onClick={() => setQuickCatOpen(false)}>Cancel</Button>
+            <Button size="sm" onClick={handleQuickCreateCategory} disabled={quickCatSaving} className="bg-primary-gradient hover:opacity-90">
+              {quickCatSaving ? <Loader2 className="h-4 w-4 mr-1.5 animate-spin" /> : null}
+              Create & Select
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
