@@ -14,9 +14,16 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { useCart } from '@/lib/store'
 import { api } from '@/lib/api-client'
-import { formatINR, buildWhatsAppOrder } from '@/lib/format'
+import { formatINR, buildWhatsAppOrder, calculateDeliveryCharge } from '@/lib/format'
 import type { Settings } from '@/lib/types'
 import { toast } from 'sonner'
 
@@ -35,6 +42,7 @@ export function CheckoutDialog({
     phone: '',
     address: '',
     city: '',
+    state: 'Gujarat',
     pincode: '',
     notes: '',
   })
@@ -42,6 +50,8 @@ export function CheckoutDialog({
   const [done, setDone] = useState(false)
 
   const total = subtotal()
+  const deliveryCharge = form.state === 'Gujarat' ? calculateDeliveryCharge(items) : undefined
+  const finalTotal = deliveryCharge !== undefined ? total + deliveryCharge : total
 
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }))
@@ -86,9 +96,11 @@ export function CheckoutDialog({
           phone: form.phone.trim(),
           address: form.address.trim(),
           city: form.city.trim(),
+          state: form.state.trim(),
           pincode: form.pincode.trim(),
           notes: form.notes.trim(),
         },
+        deliveryCharge,
       })
 
       window.open(url, '_blank', 'noopener,noreferrer')
@@ -108,7 +120,7 @@ export function CheckoutDialog({
     onOpenChange(v)
     if (!v && done) {
       setDone(false)
-      setForm({ name: '', phone: '', address: '', city: '', pincode: '', notes: '' })
+      setForm({ name: '', phone: '', address: '', city: '', state: 'Gujarat', pincode: '', notes: '' })
     }
   }
 
@@ -165,8 +177,23 @@ export function CheckoutDialog({
                 ))}
               </ul>
               <div className="mt-2 pt-2 border-t border-border flex justify-between font-bold">
+                <span>Subtotal</span>
+                <span>{formatINR(total)}</span>
+              </div>
+              {form.state === 'Gujarat' && deliveryCharge !== undefined && (
+                <div className="flex justify-between text-sm mt-1 font-medium">
+                  <span>Delivery Charge</span>
+                  <span>{formatINR(deliveryCharge)}</span>
+                </div>
+              )}
+              {form.state !== 'Gujarat' && (
+                <div className="text-xs text-muted-foreground mt-1">
+                  * Other state delivery charge will be given in WhatsApp after order.
+                </div>
+              )}
+              <div className="mt-2 pt-2 border-t border-border flex justify-between font-bold text-primary text-lg">
                 <span>Total</span>
-                <span className="text-primary">{formatINR(total)}</span>
+                <span>{form.state === 'Gujarat' && deliveryCharge !== undefined ? formatINR(finalTotal) : formatINR(total)}</span>
               </div>
             </div>
 
@@ -189,9 +216,23 @@ export function CheckoutDialog({
                 <Label htmlFor="address">Delivery Address *</Label>
                 <Textarea id="address" value={form.address} onChange={set('address')} rows={2} placeholder="House no, street, area, landmark…" />
               </div>
-              <div className="grid gap-1.5">
-                <Label htmlFor="city">City</Label>
-                <Input id="city" value={form.city} onChange={set('city')} placeholder="e.g. Ahmedabad" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid gap-1.5">
+                  <Label htmlFor="city">City</Label>
+                  <Input id="city" value={form.city} onChange={set('city')} placeholder="e.g. Ahmedabad" />
+                </div>
+                <div className="grid gap-1.5">
+                  <Label htmlFor="state">State *</Label>
+                  <Select value={form.state} onValueChange={(v) => setForm(f => ({ ...f, state: v }))}>
+                    <SelectTrigger id="state">
+                      <SelectValue placeholder="Select State" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Gujarat">Gujarat</SelectItem>
+                      <SelectItem value="Other">Other State</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               <div className="grid gap-1.5">
                 <Label htmlFor="notes">Order Notes (optional)</Label>

@@ -26,6 +26,24 @@ export function discountPercent(mrp: number, price: number): number {
  *
  * Please confirm my order
  */
+export function parseWeightToGrams(weight: string): number {
+  const w = weight.toLowerCase().trim()
+  const num = parseFloat(w.replace(/[^0-9.]/g, ''))
+  if (isNaN(num)) return 0
+  if (w.includes('kg')) return num * 1000
+  return num
+}
+
+export function calculateDeliveryCharge(items: {weight: string, quantity: number}[]): number {
+  let totalGrams = 0
+  for (const item of items) {
+    totalGrams += parseWeightToGrams(item.weight) * item.quantity
+  }
+  if (totalGrams === 0) return 0
+  const totalKg = Math.ceil(totalGrams / 1000)
+  return totalKg * 20
+}
+
 export function buildWhatsAppOrder(args: {
   items: CartItem[]
   subtotal: number
@@ -35,16 +53,18 @@ export function buildWhatsAppOrder(args: {
     phone: string
     address: string
     city?: string
+    state: string
     pincode?: string
     notes?: string
   }
+  deliveryCharge?: number
 }): { text: string; url: string } {
-  const { items, subtotal, settings, customer } = args
+  const { items, subtotal, settings, customer, deliveryCharge } = args
 
-  // Address line: "address, city, Gujarat - pincode" (matches the requested format)
+  // Address line: "address, city, state - pincode"
   const addrParts: string[] = [customer.address.trim()]
   if (customer.city?.trim()) addrParts.push(customer.city.trim())
-  addrParts.push('Gujarat')
+  if (customer.state?.trim()) addrParts.push(customer.state.trim())
   const addrLine = addrParts.join(', ') + (customer.pincode?.trim() ? ` - ${customer.pincode.trim()}` : '')
 
   const lines: string[] = []
@@ -60,7 +80,15 @@ export function buildWhatsAppOrder(args: {
     lines.push(`* ${guj} (${it.weight}) x${it.quantity} = ${formatINR(it.price * it.quantity)}`)
   })
   lines.push('')
-  lines.push(`Total: ${formatINR(subtotal)}`)
+  if (customer.state === 'Gujarat' && deliveryCharge !== undefined) {
+    lines.push(`Delivery Charge: ${formatINR(deliveryCharge)}`)
+    lines.push(`Total: ${formatINR(subtotal + deliveryCharge)}`)
+  } else if (customer.state !== 'Gujarat') {
+    lines.push(`Total: ${formatINR(subtotal)}`)
+    lines.push('Other state delivery charge will be given in whatsapp after getting order')
+  } else {
+    lines.push(`Total: ${formatINR(subtotal)}`)
+  }
   if (customer.notes?.trim()) {
     lines.push('')
     lines.push(`Notes: ${customer.notes.trim()}`)

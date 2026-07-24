@@ -12,7 +12,7 @@ export async function GET(
     }
 
     // Try finding exact slug first, or fallback to matching id or partial name
-    let product = await db.product.findUnique({
+    let product: any = await db.product.findUnique({
       where: { slug },
       include: { category: true },
     })
@@ -23,8 +23,8 @@ export async function GET(
         where: {
           OR: [
             { id: slug },
-            { slug: { equals: slug, mode: 'insensitive' } },
-            { name: { equals: slug.replace(/-/g, ' '), mode: 'insensitive' } },
+            { slug: { equals: slug } },
+            { name: { equals: slug.replace(/-/g, ' ') } },
           ],
         },
         include: { category: true },

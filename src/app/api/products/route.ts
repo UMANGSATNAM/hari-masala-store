@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
     const {
-      name, gujaratiName, description, price, mrp, weight,
+      name, gujaratiName, description, price, mrp, weight, variants,
       categoryId, image, stock, featured, active, rating,
     } = body
 
@@ -97,6 +97,7 @@ export async function POST(req: NextRequest) {
         price: Number(price),
         mrp: Number(mrp) || Number(price),
         weight: weight || '100g',
+        variants: variants ? JSON.stringify(variants) : undefined,
         categoryId,
         image,
         stock: Number(stock) ?? 50,

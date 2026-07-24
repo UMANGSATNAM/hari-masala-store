@@ -49,29 +49,36 @@ export function ProductDetailView({
   const [added, setAdded] = useState(false)
   const [checkoutOpen, setCheckoutOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<'why' | 'recipes' | 'reviews'>('why')
+  const [selectedVariantIdx, setSelectedVariantIdx] = useState(0)
 
-  const discount = discountPercent(product.mrp, product.price)
+  const parsedVariants = (product.variants && (product.variants as any).length > 0)
+    ? (product.variants as any)
+    : [{ weight: product.weight, price: product.price, mrp: product.mrp }]
+  
+  const selectedVariant = parsedVariants[selectedVariantIdx]
+
+  const discount = discountPercent(selectedVariant.mrp, selectedVariant.price)
   const outOfStock = product.stock <= 0
 
   const handleAddToCart = () => {
     if (outOfStock) return
-    add(product, qty)
+    add(product, qty, selectedVariant)
     setAdded(true)
-    const label = product.gujaratiName ? `${product.gujaratiName} (${product.name})` : product.name
+    const label = product.gujaratiName ? `${product.gujaratiName} (${product.name}) - ${selectedVariant.weight}` : `${product.name} - ${selectedVariant.weight}`
     toast.success(`✓ Added ${qty}x ${label} to cart`)
     setTimeout(() => setAdded(false), 2000)
   }
 
   const handleBuyNow = () => {
     if (outOfStock) return
-    add(product, qty)
+    add(product, qty, selectedVariant)
     setCheckoutOpen(true)
   }
 
   const handleWhatsAppOrder = () => {
     const label = product.gujaratiName ? `${product.gujaratiName} - ${product.name}` : product.name
     const text = encodeURIComponent(
-      `Namaste Hari Masala! I would like to order:\n\n*Product:* ${label}\n*Weight:* ${product.weight}\n*Quantity:* ${qty} pack(s)\n*Price:* ${formatINR(product.price * qty)}\n\nPlease confirm my order and share delivery details.`
+      `Namaste Hari Masala! I would like to order:\n\n*Product:* ${label}\n*Weight:* ${selectedVariant.weight}\n*Quantity:* ${qty} pack(s)\n*Price:* ${formatINR(selectedVariant.price * qty)}\n\nPlease confirm my order and share delivery details.`
     )
     window.open(`https://wa.me/${settings.whatsappNumber}?text=${text}`, '_blank')
   }
@@ -186,12 +193,12 @@ export function ProductDetailView({
             <div className="mt-6 p-4 sm:p-5 rounded-2xl border border-primary/20 bg-primary/5 dark:bg-primary/10 flex flex-col gap-2">
               <div className="flex items-baseline gap-3">
                 <span className="text-3xl sm:text-4xl font-black text-primary tracking-tight">
-                  {formatINR(product.price)}
+                  {formatINR(selectedVariant.price)}
                 </span>
                 {discount > 0 && (
                   <>
                     <span className="text-base sm:text-lg text-muted-foreground line-through font-medium">
-                      {formatINR(product.mrp)}
+                      {formatINR(selectedVariant.mrp)}
                     </span>
                     <span className="text-xs sm:text-sm font-bold text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-950/80 px-2.5 py-0.5 rounded-md">
                       Save {discount}% Today
@@ -200,9 +207,31 @@ export function ProductDetailView({
                 )}
               </div>
               <p className="text-xs text-muted-foreground font-medium">
-                Pack Size: <span className="font-bold text-foreground">{product.weight}</span> · Inclusive of all taxes · Free delivery on orders above ₹{settings.freeShipThreshold}
+                Pack Size: <span className="font-bold text-foreground">{selectedVariant.weight}</span> · Inclusive of all taxes · Free delivery on orders above ₹{settings.freeShipThreshold}
               </p>
             </div>
+
+            {/* Variant Selector */}
+            {parsedVariants.length > 1 && (
+              <div className="mt-6">
+                <span className="text-sm font-semibold text-foreground mb-2 block">Pack Size:</span>
+                <div className="flex flex-wrap gap-2">
+                  {parsedVariants.map((v: any, i: number) => (
+                    <button
+                      key={i}
+                      onClick={() => setSelectedVariantIdx(i)}
+                      className={`px-4 py-2 text-sm font-bold rounded-lg border transition-all ${
+                        i === selectedVariantIdx 
+                          ? 'border-primary bg-primary/10 text-primary shadow-sm' 
+                          : 'border-border bg-card text-muted-foreground hover:border-primary/50'
+                      }`}
+                    >
+                      {v.weight}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Quantity Selector & Pack options */}
             <div className="mt-6 flex flex-wrap items-center gap-4">
@@ -480,8 +509,9 @@ export function ProductDetailView({
           <div className="min-w-0">
             <p className="font-bold text-sm text-foreground truncate">{product.gujaratiName || product.name}</p>
             <div className="flex items-center gap-2">
-              <span className="font-black text-sm text-primary">{formatINR(product.price)}</span>
-              {discount > 0 && <span className="text-xs text-muted-foreground line-through">{formatINR(product.mrp)}</span>}
+              <span className="font-black text-sm text-primary">{formatINR(selectedVariant.price)}</span>
+              {discount > 0 && <span className="text-xs text-muted-foreground line-through">{formatINR(selectedVariant.mrp)}</span>}
+              <span className="text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded font-medium">{selectedVariant.weight}</span>
             </div>
           </div>
         </div>

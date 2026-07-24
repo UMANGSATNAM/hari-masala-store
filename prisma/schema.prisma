@@ -26,6 +26,7 @@ model Product {
   price         Float
   mrp           Float
   weight        String
+  variants      Json?
   categoryId    String
   category      Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   image         String

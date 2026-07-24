@@ -27,15 +27,20 @@ import { CategorySvgIcon, COMMON_SVG_ICONS } from '@/components/ui/category-svg-
 import type { Category, Product } from '@/lib/types'
 import { toast } from 'sonner'
 
+type FormVariant = {
+  weight: string; price: string; mrp: string
+}
+
 type FormState = {
-  name: string; gujaratiName: string; description: string; price: string; mrp: string
-  weight: string; categoryId: string; image: string; stock: string; featured: boolean
-  active: boolean; rating: string
+  name: string; gujaratiName: string; description: string;
+  categoryId: string; image: string; stock: string; featured: boolean
+  active: boolean; rating: string; variants: FormVariant[]
 }
 
 const emptyForm: FormState = {
-  name: '', gujaratiName: '', description: '', price: '', mrp: '', weight: '100g',
+  name: '', gujaratiName: '', description: '',
   categoryId: '', image: '', stock: '50', featured: false, active: true, rating: '4.5',
+  variants: [{ weight: '100g', price: '', mrp: '' }]
 }
 
 export function AdminProducts({ categories, onCategoryAdded }: { categories: Category[]; onCategoryAdded?: (cat: Category) => void }) {
@@ -147,28 +152,41 @@ export function AdminProducts({ categories, onCategoryAdded }: { categories: Cat
 
   const openEdit = (p: Product) => {
     setEditing(p)
+    const parsedVariants = (p as any).variants as { weight: string, price: number, mrp: number }[] || []
+    const variantsList = parsedVariants.length > 0
+      ? parsedVariants.map(v => ({ weight: v.weight, price: String(v.price), mrp: String(v.mrp) }))
+      : [{ weight: p.weight, price: String(p.price), mrp: String(p.mrp) }]
+
     setForm({
       name: p.name, gujaratiName: p.gujaratiName || '', description: p.description,
-      price: String(p.price), mrp: String(p.mrp), weight: p.weight,
       categoryId: p.categoryId, image: p.image, stock: String(p.stock),
       featured: p.featured, active: p.active, rating: String(p.rating),
+      variants: variantsList
     })
     setDialogOpen(true)
   }
 
   const save = async () => {
-    if (!form.name || !form.description || !form.price || !form.categoryId || !form.image) {
+    if (!form.name || !form.description || !form.variants[0]?.price || !form.categoryId || !form.image) {
       toast.error('Please fill all required fields (name, description, price, category, image)')
       return
     }
     setSaving(true)
     try {
+      const rootVariant = form.variants[0]
+      const parsedVariants = form.variants.map(v => ({
+        weight: v.weight,
+        price: Number(v.price),
+        mrp: Number(v.mrp) || Number(v.price)
+      }))
+
       const payload = {
         name: form.name, gujaratiName: form.gujaratiName || null, description: form.description,
-        price: Number(form.price), mrp: Number(form.mrp) || Number(form.price),
-        weight: form.weight, categoryId: form.categoryId, image: form.image,
+        price: Number(rootVariant.price), mrp: Number(rootVariant.mrp) || Number(rootVariant.price),
+        weight: rootVariant.weight, categoryId: form.categoryId, image: form.image,
         stock: Number(form.stock), featured: form.featured, active: form.active,
         rating: Number(form.rating) || 4.5,
+        variants: parsedVariants
       }
       if (editing) {
         const { product } = await api.updateProduct(editing.id, payload)
@@ -482,24 +500,78 @@ export function AdminProducts({ categories, onCategoryAdded }: { categories: Cat
               <Label>Description *</Label>
               <Textarea rows={3} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Describe the spice…" />
             </div>
-            <div className="grid grid-cols-3 gap-3">
-              <div className="grid gap-1.5">
-                <Label>Price (₹) *</Label>
-                <Input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} />
+            <div className="border border-border rounded-lg p-3 space-y-3">
+              <div className="flex items-center justify-between">
+                <Label>Quantity Options & Pricing *</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-7 text-xs"
+                  onClick={() => setForm({ ...form, variants: [...form.variants, { weight: '', price: '', mrp: '' }] })}
+                >
+                  <Plus className="h-3 w-3 mr-1" /> Add Variant
+                </Button>
               </div>
-              <div className="grid gap-1.5">
-                <Label>MRP (₹)</Label>
-                <Input type="number" value={form.mrp} onChange={(e) => setForm({ ...form, mrp: e.target.value })} />
+              
+              <div className="space-y-2">
+                {form.variants.map((v, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <Input
+                      placeholder="Weight (e.g. 500g)"
+                      value={v.weight}
+                      onChange={(e) => {
+                        const newV = [...form.variants]
+                        newV[i].weight = e.target.value
+                        setForm({ ...form, variants: newV })
+                      }}
+                      className="flex-1"
+                    />
+                    <Input
+                      type="number"
+                      placeholder="Price (₹)"
+                      value={v.price}
+                      onChange={(e) => {
+                        const newV = [...form.variants]
+                        newV[i].price = e.target.value
+                        setForm({ ...form, variants: newV })
+                      }}
+                      className="w-24 shrink-0"
+                    />
+                    <Input
+                      type="number"
+                      placeholder="MRP (₹)"
+                      value={v.mrp}
+                      onChange={(e) => {
+                        const newV = [...form.variants]
+                        newV[i].mrp = e.target.value
+                        setForm({ ...form, variants: newV })
+                      }}
+                      className="w-24 shrink-0"
+                    />
+                    {form.variants.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-9 w-9 text-destructive shrink-0"
+                        onClick={() => {
+                          const newV = form.variants.filter((_, idx) => idx !== i)
+                          setForm({ ...form, variants: newV })
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
               </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
               <div className="grid gap-1.5">
                 <Label>Stock</Label>
                 <Input type="number" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="grid gap-1.5">
-                <Label>Weight</Label>
-                <Input value={form.weight} onChange={(e) => setForm({ ...form, weight: e.target.value })} placeholder="e.g. 200g" />
               </div>
               <div className="grid gap-1.5">
                 <Label>Rating</Label>

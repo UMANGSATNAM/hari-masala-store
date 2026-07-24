@@ -13,16 +13,23 @@ import { toast } from 'sonner'
 export function ProductCard({ product }: { product: Product }) {
   const add = useCart((s) => s.add)
   const [added, setAdded] = useState(false)
-  const discount = discountPercent(product.mrp, product.price)
+  const [selectedVariantIdx, setSelectedVariantIdx] = useState(0)
+
+  const parsedVariants = (product.variants && (product.variants as any).length > 0)
+    ? (product.variants as any)
+    : [{ weight: product.weight, price: product.price, mrp: product.mrp }]
+  
+  const selectedVariant = parsedVariants[selectedVariantIdx]
+  const discount = discountPercent(selectedVariant.mrp, selectedVariant.price)
   const outOfStock = product.stock <= 0
 
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
     if (outOfStock) return
-    add(product, 1)
+    add(product, 1, selectedVariant)
     setAdded(true)
-    const label = product.gujaratiName ? `${product.gujaratiName} (${product.name})` : product.name
+    const label = product.gujaratiName ? `${product.gujaratiName} (${product.name}) - ${selectedVariant.weight}` : `${product.name} - ${selectedVariant.weight}`
     toast.success(`✓ ${label} added to cart`, { duration: 2000 })
     setTimeout(() => setAdded(false), 1800)
   }
@@ -79,10 +86,32 @@ export function ProductCard({ product }: { product: Product }) {
           </div>
         </div>
 
-        <div className="mt-1.5 flex items-center gap-2">
-          <span className="text-[11px] font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-            {product.weight}
-          </span>
+        <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+          {parsedVariants.length > 1 ? (
+            <div className="flex flex-wrap gap-1 w-full mb-1">
+              {parsedVariants.map((v: any, i: number) => (
+                <button
+                  key={i}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    setSelectedVariantIdx(i)
+                  }}
+                  className={`text-[10px] sm:text-[11px] font-medium px-2 py-0.5 rounded-full border transition-colors ${
+                    i === selectedVariantIdx 
+                      ? 'border-primary bg-primary/10 text-primary' 
+                      : 'border-border bg-muted/50 text-muted-foreground hover:bg-muted'
+                  }`}
+                >
+                  {v.weight}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <span className="text-[11px] font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+              {selectedVariant.weight}
+            </span>
+          )}
           <span className="text-[11px] text-muted-foreground">
             {product.stock < 15 && product.stock > 0
               ? `Only ${product.stock} left`
@@ -94,11 +123,11 @@ export function ProductCard({ product }: { product: Product }) {
           <div className="flex items-end justify-between gap-2">
             <div className="flex flex-col">
               <span className="text-lg font-bold text-primary leading-none">
-                {formatINR(product.price)}
+                {formatINR(selectedVariant.price)}
               </span>
               {discount > 0 && (
                 <span className="text-xs text-muted-foreground line-through mt-0.5">
-                  {formatINR(product.mrp)}
+                  {formatINR(selectedVariant.mrp)}
                 </span>
               )}
             </div>

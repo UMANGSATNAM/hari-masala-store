@@ -2,13 +2,13 @@
 
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { CartItem, Product } from './types'
+import type { CartItem, Product, ProductVariant } from './types'
 
 type CartState = {
   items: CartItem[]
   isOpen: boolean
   setOpen: (open: boolean) => void
-  add: (product: Product, quantity?: number) => void
+  add: (product: Product, quantity?: number, variant?: ProductVariant) => void
   remove: (id: string) => void
   setQty: (id: string, quantity: number) => void
   clear: () => void
@@ -22,14 +22,15 @@ export const useCart = create<CartState>()(
       items: [],
       isOpen: false,
       setOpen: (open) => set({ isOpen: open }),
-      add: (product, quantity = 1) => {
+      add: (product, quantity = 1, variant) => {
         const items = get().items
-        const existing = items.find((i) => i.id === product.id)
+        const cartItemId = variant ? `${product.id}-${variant.weight}` : product.id
+        const existing = items.find((i) => i.id === cartItemId)
         if (existing) {
           const newQty = Math.min(existing.quantity + quantity, product.stock)
           set({
             items: items.map((i) =>
-              i.id === product.id ? { ...i, quantity: newQty } : i
+              i.id === cartItemId ? { ...i, quantity: newQty } : i
             ),
             isOpen: true,
           })
@@ -38,13 +39,13 @@ export const useCart = create<CartState>()(
             items: [
               ...items,
               {
-                id: product.id,
+                id: cartItemId,
                 name: product.name,
                 gujaratiName: product.gujaratiName,
                 slug: product.slug,
-                price: product.price,
-                mrp: product.mrp,
-                weight: product.weight,
+                price: variant ? variant.price : product.price,
+                mrp: variant ? variant.mrp : product.mrp,
+                weight: variant ? variant.weight : product.weight,
                 image: product.image,
                 quantity: Math.min(quantity, product.stock),
                 stock: product.stock,

@@ -15,6 +15,7 @@ export type Product = {
   price: number
   mrp: number
   weight: string
+  variants?: ProductVariant[]
   categoryId: string
   category?: Category
   image: string
@@ -24,6 +25,12 @@ export type Product = {
   rating: number
   createdAt: string
   updatedAt: string
+}
+
+export type ProductVariant = {
+  weight: string
+  price: number
+  mrp: number
 }
 
 export type CartItem = {
