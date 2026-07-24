@@ -14,8 +14,8 @@ export async function GET(req: NextRequest) {
 
   try {
     const nodePath = process.execPath
-    // Run prisma db push and the migration script using local binary
-    const { stdout, stderr } = await execAsync(`"${nodePath}" node_modules/prisma/build/index.js db push --accept-data-loss && "${nodePath}" scripts/migrate.js`)
+    // Run the migration script which now handles table creation and data migration
+    const { stdout, stderr } = await execAsync(`"${nodePath}" scripts/migrate.js`)
     
     return NextResponse.json({ 
       success: true, 
