@@ -10,15 +10,19 @@ async function main() {
   
   for (const product of products) {
     if (product.categoryId) {
-      await prisma.product.update({
-        where: { id: product.id },
-        data: {
-          categories: {
-            connect: { id: product.categoryId }
+      try {
+        await prisma.product.update({
+          where: { id: product.id },
+          data: {
+            categories: {
+              connect: { id: product.categoryId }
+            }
           }
-        }
-      })
-      console.log(`Migrated product: ${product.name}`)
+        })
+        console.log(`Migrated product: ${product.name}`)
+      } catch (err) {
+        console.log(`Skipped product (already migrated or error): ${product.name}`)
+      }
     }
   }
   

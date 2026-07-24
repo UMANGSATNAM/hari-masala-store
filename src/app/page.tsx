@@ -68,7 +68,7 @@ export default function Home() {
   const filteredProducts = useMemo(() => {
     let list = products
     if (activeCategory !== 'all') {
-      list = list.filter((p) => p.category?.slug === activeCategory)
+      list = list.filter((p) => p.categories?.some((c) => c.slug === activeCategory) || p.category?.slug === activeCategory)
     }
     if (search.trim()) {
       const q = search.toLowerCase()
