@@ -45,29 +45,7 @@ export function CartDrawer({
           </div>
         </SheetHeader>
 
-        {/* Free shipping progress */}
-        {items.length > 0 && (
-          <div className="px-4 py-3 bg-accent/40 border-b border-border">
-            <div className="flex items-center gap-2 text-xs text-accent-foreground mb-1.5">
-              <Truck className="h-4 w-4" />
-              {remaining > 0 ? (
-                <span>
-                  Add <strong>{formatINR(remaining)}</strong> more for FREE delivery
-                </span>
-              ) : (
-                <span className="inline-flex items-center gap-1 font-semibold text-green-700">
-                  <Sparkles className="h-3.5 w-3.5 text-primary shrink-0 animate-pulse" /> You&apos;ve unlocked FREE delivery!
-                </span>
-              )}
-            </div>
-            <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
-              <div
-                className="h-full bg-saffron-gradient transition-all"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-          </div>
-        )}
+
 
         {/* Items */}
         <div className="flex-1 overflow-y-auto scrollbar-thin">
@@ -156,9 +134,7 @@ export function CartDrawer({
             </div>
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Delivery</span>
-              <span className="font-semibold text-green-700">
-                {remaining > 0 ? 'Calculated on WhatsApp' : 'FREE'}
-              </span>
+              <span className="font-semibold text-primary">Calculated at checkout</span>
             </div>
             <Separator />
             <div className="flex items-center justify-between">
