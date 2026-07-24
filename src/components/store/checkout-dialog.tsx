@@ -227,9 +227,18 @@ export function CheckoutDialog({
                     <SelectTrigger id="state">
                       <SelectValue placeholder="Select State" />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Gujarat">Gujarat</SelectItem>
-                      <SelectItem value="Other">Other State</SelectItem>
+                    <SelectContent className="max-h-64">
+                      {[
+                        "Andaman and Nicobar Islands", "Andhra Pradesh", "Arunachal Pradesh", "Assam", 
+                        "Bihar", "Chandigarh", "Chhattisgarh", "Dadra and Nagar Haveli and Daman and Diu", 
+                        "Delhi", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jammu and Kashmir", 
+                        "Jharkhand", "Karnataka", "Kerala", "Ladakh", "Lakshadweep", "Madhya Pradesh", 
+                        "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", 
+                        "Puducherry", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", 
+                        "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal"
+                      ].map(state => (
+                        <SelectItem key={state} value={state}>{state}</SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
