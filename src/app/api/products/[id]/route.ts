@@ -21,7 +21,7 @@ export async function PUT(
         } else if (['featured', 'active'].includes(f)) {
           data[f] = Boolean(body[f])
         } else if (f === 'variants') {
-          data[f] = body[f] ? JSON.stringify(body[f]) : null
+          data[f] = body[f] ? body[f] : null
         } else {
           data[f] = body[f]
         }

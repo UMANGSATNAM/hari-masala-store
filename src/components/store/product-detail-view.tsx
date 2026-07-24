@@ -51,10 +51,14 @@ export function ProductDetailView({
   const [activeTab, setActiveTab] = useState<'why' | 'recipes' | 'reviews'>('why')
   const [selectedVariantIdx, setSelectedVariantIdx] = useState(0)
 
-  const parsedVariants = (product.variants && (product.variants as any).length > 0)
-    ? (product.variants as any)
-    : [{ weight: product.weight, price: product.price, mrp: product.mrp }]
-  
+  let parsedVariants = [{ weight: product.weight, price: product.price, mrp: product.mrp }]
+  if (product.variants) {
+    if (typeof product.variants === 'string') {
+      try { parsedVariants = JSON.parse(product.variants) } catch (e) {}
+    } else if (Array.isArray(product.variants) && product.variants.length > 0) {
+      parsedVariants = product.variants as any
+    }
+  }
   const selectedVariant = parsedVariants[selectedVariantIdx]
 
   const discount = discountPercent(selectedVariant.mrp, selectedVariant.price)

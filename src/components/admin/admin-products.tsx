@@ -152,7 +152,15 @@ export function AdminProducts({ categories, onCategoryAdded }: { categories: Cat
 
   const openEdit = (p: Product) => {
     setEditing(p)
-    const parsedVariants = (p as any).variants as { weight: string, price: number, mrp: number }[] || []
+    let parsedVariants: { weight: string, price: number, mrp: number }[] = []
+    if (p.variants) {
+      if (typeof p.variants === 'string') {
+        try { parsedVariants = JSON.parse(p.variants) } catch (e) {}
+      } else if (Array.isArray(p.variants)) {
+        parsedVariants = p.variants as any
+      }
+    }
+
     const variantsList = parsedVariants.length > 0
       ? parsedVariants.map(v => ({ weight: v.weight, price: String(v.price), mrp: String(v.mrp) }))
       : [{ weight: p.weight, price: String(p.price), mrp: String(p.mrp) }]
