@@ -13,8 +13,8 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    // Run prisma db push and the migration script
-    const { stdout, stderr } = await execAsync('npx prisma db push --accept-data-loss && node scripts/migrate.js')
+    // Run prisma db push and the migration script using local binary
+    const { stdout, stderr } = await execAsync('node node_modules/prisma/build/index.js db push --accept-data-loss && node scripts/migrate.js')
     
     return NextResponse.json({ 
       success: true, 
