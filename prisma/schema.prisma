@@ -14,7 +14,8 @@ model Category {
   slug      String    @unique
   icon      String?
   sortOrder Int       @default(0)
-  products  Product[]
+  primaryProducts  Product[] @relation("PrimaryCategory")
+  products  Product[] @relation("ProductCategories")
 }
 
 model Product {
@@ -27,8 +28,9 @@ model Product {
   mrp           Float
   weight        String
   variants      Json?
-  categoryId    String
-  category      Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId    String?
+  category      Category? @relation("PrimaryCategory", fields: [categoryId], references: [id], onDelete: Cascade)
+  categories    Category[] @relation("ProductCategories")
   image         String
   stock         Int      @default(50)
   featured      Boolean  @default(false)

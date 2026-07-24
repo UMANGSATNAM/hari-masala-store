@@ -16,8 +16,7 @@ export type Product = {
   mrp: number
   weight: string
   variants?: ProductVariant[]
-  categoryId: string
-  category?: Category
+  categories: Category[]
   image: string
   stock: number
   featured: boolean

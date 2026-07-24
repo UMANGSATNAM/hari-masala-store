@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
 
   const where: Record<string, unknown> = { active: true }
   if (category && category !== 'all') {
-    where.category = { slug: category }
+    where.categories = { some: { slug: category } }
   }
   if (featured === 'true') {
     where.featured = true
@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
   try {
     const products = await db.product.findMany({
       where,
-      include: { category: true },
+      include: { categories: true },
       orderBy: [{ featured: 'desc' }, { createdAt: 'desc' }],
     })
     return NextResponse.json({ products })
@@ -77,10 +77,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     const {
       name, gujaratiName, description, price, mrp, weight, variants,
-      categoryId, image, stock, featured, active, rating,
+      categoryIds, image, stock, featured, active, rating,
     } = body
 
-    if (!name || !description || price == null || !categoryId || !image) {
+    if (!name || !description || price == null || !categoryIds || categoryIds.length === 0 || !image) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -98,14 +98,15 @@ export async function POST(req: NextRequest) {
         mrp: Number(mrp) || Number(price),
         weight: weight || '100g',
         variants: variants ? variants : undefined,
-        categoryId,
+        categories: { connect: categoryIds.map((id: string) => ({ id })) },
+        categoryId: categoryIds[0], // Maintain temporarily for migration
         image,
         stock: Number(stock) ?? 50,
         featured: Boolean(featured),
         active: active !== false,
         rating: Number(rating) || 4.5,
       },
-      include: { category: true },
+      include: { categories: true },
     })
 
     return NextResponse.json({ product }, { status: 201 })

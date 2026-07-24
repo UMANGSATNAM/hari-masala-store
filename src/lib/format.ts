@@ -81,10 +81,11 @@ export function buildWhatsAppOrder(args: {
   })
   lines.push('')
   if (customer.state === 'Gujarat' && deliveryCharge !== undefined) {
+    lines.push(`Products Total: ${formatINR(subtotal)}`)
     lines.push(`Delivery Charge: ${formatINR(deliveryCharge)}`)
-    lines.push(`Total: ${formatINR(subtotal + deliveryCharge)}`)
+    lines.push(`Full Total: ${formatINR(subtotal + deliveryCharge)}`)
   } else if (customer.state !== 'Gujarat') {
-    lines.push(`Total: ${formatINR(subtotal)}`)
+    lines.push(`Products Total: ${formatINR(subtotal)}`)
     lines.push('Other state delivery charge will be given in whatsapp after getting order')
   } else {
     lines.push(`Total: ${formatINR(subtotal)}`)

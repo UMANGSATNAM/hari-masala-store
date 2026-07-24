@@ -169,7 +169,11 @@ export function ProductDetailView({
           <div className="md:col-span-6 lg:col-span-7 flex flex-col">
             <div className="flex items-center justify-between gap-2">
               <span className="text-xs font-bold tracking-wider uppercase text-primary bg-primary/10 px-2.5 py-1 rounded-full">
-                {product.category?.name || 'Authentic Spice'}
+                {product.categories && product.categories.length > 0 ? (
+                  product.categories.map((c: any) => c.name).join(', ')
+                ) : (
+                  product.category?.name || 'Authentic Spice'
+                )}
               </span>
               <div className="flex items-center gap-1 text-amber-500 bg-amber-500/10 px-3 py-1 rounded-full">
                 <Star className="h-4 w-4 fill-current" />

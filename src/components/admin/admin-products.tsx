@@ -33,13 +33,13 @@ type FormVariant = {
 
 type FormState = {
   name: string; gujaratiName: string; description: string;
-  categoryId: string; image: string; stock: string; featured: boolean
+  categoryIds: string[]; image: string; stock: string; featured: boolean
   active: boolean; rating: string; variants: FormVariant[]
 }
 
 const emptyForm: FormState = {
   name: '', gujaratiName: '', description: '',
-  categoryId: '', image: '', stock: '50', featured: false, active: true, rating: '4.5',
+  categoryIds: [], image: '', stock: '50', featured: false, active: true, rating: '4.5',
   variants: [{ weight: '100g', price: '', mrp: '' }]
 }
 
@@ -73,7 +73,7 @@ export function AdminProducts({ categories, onCategoryAdded }: { categories: Cat
         sortOrder: categories.length + 1,
       })
       onCategoryAdded?.(category)
-      setForm((f) => ({ ...f, categoryId: category.id }))
+      setForm((f) => ({ ...f, categoryIds: [...f.categoryIds, category.id] }))
       toast.success(`Category "${category.name}" created and selected!`)
       setQuickCatOpen(false)
       setQuickCatName('')
@@ -146,7 +146,7 @@ export function AdminProducts({ categories, onCategoryAdded }: { categories: Cat
 
   const openCreate = () => {
     setEditing(null)
-    setForm({ ...emptyForm, categoryId: categories[0]?.id || '' })
+    setForm({ ...emptyForm, categoryIds: categories[0] ? [categories[0].id] : [] })
     setDialogOpen(true)
   }
 
@@ -165,9 +165,11 @@ export function AdminProducts({ categories, onCategoryAdded }: { categories: Cat
       ? parsedVariants.map(v => ({ weight: v.weight, price: String(v.price), mrp: String(v.mrp) }))
       : [{ weight: p.weight, price: String(p.price), mrp: String(p.mrp) }]
 
+    const categoryIds = p.categories ? p.categories.map(c => c.id) : (p.categoryId ? [p.categoryId] : [])
+
     setForm({
       name: p.name, gujaratiName: p.gujaratiName || '', description: p.description,
-      categoryId: p.categoryId, image: p.image, stock: String(p.stock),
+      categoryIds, image: p.image, stock: String(p.stock),
       featured: p.featured, active: p.active, rating: String(p.rating),
       variants: variantsList
     })
@@ -175,7 +177,7 @@ export function AdminProducts({ categories, onCategoryAdded }: { categories: Cat
   }
 
   const save = async () => {
-    if (!form.name || !form.description || !form.variants[0]?.price || !form.categoryId || !form.image) {
+    if (!form.name || !form.description || !form.variants[0]?.price || !form.categoryIds.length || !form.image) {
       toast.error('Please fill all required fields (name, description, price, category, image)')
       return
     }
@@ -191,7 +193,7 @@ export function AdminProducts({ categories, onCategoryAdded }: { categories: Cat
       const payload = {
         name: form.name, gujaratiName: form.gujaratiName || null, description: form.description,
         price: Number(rootVariant.price), mrp: Number(rootVariant.mrp) || Number(rootVariant.price),
-        weight: rootVariant.weight, categoryId: form.categoryId, image: form.image,
+        weight: rootVariant.weight, categoryIds: form.categoryIds, image: form.image,
         stock: Number(form.stock), featured: form.featured, active: form.active,
         rating: Number(form.rating) || 4.5,
         variants: parsedVariants
@@ -264,7 +266,12 @@ export function AdminProducts({ categories, onCategoryAdded }: { categories: Cat
     }
   }
 
-  const catName = (id: string) => categories.find((c) => c.id === id)?.name || '—'
+  const catNames = (p: Product) => {
+    if (p.categories && p.categories.length > 0) {
+      return p.categories.map(c => c.name).join(', ')
+    }
+    return categories.find((c) => c.id === p.categoryId)?.name || '—'
+  }
 
   return (
     <div className="space-y-5">
@@ -333,7 +340,7 @@ export function AdminProducts({ categories, onCategoryAdded }: { categories: Cat
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-2.5 text-muted-foreground">{catName(p.categoryId)}</td>
+                  <td className="px-4 py-2.5 text-muted-foreground">{catNames(p)}</td>
                   <td className="px-4 py-2.5">
                     {priceEdit?.id === p.id ? (
                       <Input
@@ -597,19 +604,33 @@ export function AdminProducts({ categories, onCategoryAdded }: { categories: Cat
                   <Plus className="h-3 w-3" /> New Category
                 </button>
               </div>
-              <Select value={form.categoryId} onValueChange={(v) => setForm({ ...form, categoryId: v })}>
-                <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
-                <SelectContent>
-                  {categories.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>
-                      <span className="flex items-center gap-2">
-                        <CategorySvgIcon category={c} className="h-4 w-4 text-primary shrink-0" />
-                        {c.name}
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="flex flex-wrap gap-2 pt-1">
+                {categories.map((c) => {
+                  const isSelected = form.categoryIds.includes(c.id)
+                  return (
+                    <button
+                      key={c.id}
+                      type="button"
+                      onClick={() => {
+                        setForm(f => ({
+                          ...f,
+                          categoryIds: isSelected 
+                            ? f.categoryIds.filter(id => id !== c.id)
+                            : [...f.categoryIds, c.id]
+                        }))
+                      }}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm border transition-colors ${
+                        isSelected 
+                          ? 'bg-primary text-primary-foreground border-primary' 
+                          : 'bg-card text-muted-foreground border-border hover:border-primary/50'
+                      }`}
+                    >
+                      <CategorySvgIcon category={c} className={`h-4 w-4 shrink-0 ${isSelected ? 'text-primary-foreground' : 'text-primary'}`} />
+                      {c.name}
+                    </button>
+                  )
+                })}
+              </div>
             </div>
             <div className="flex items-center gap-6 pt-1">
               <label className="flex items-center gap-2 text-sm">

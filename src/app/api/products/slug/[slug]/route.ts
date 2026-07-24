@@ -14,9 +14,8 @@ export async function GET(
     // Try finding exact slug first, or fallback to matching id or partial name
     let product: any = await db.product.findUnique({
       where: { slug },
-      include: { category: true },
+      include: { categories: true },
     })
-
     if (!product && slug) {
       // Fallback if accessed by ID or slightly altered slug
       product = await db.product.findFirst({
@@ -27,25 +26,23 @@ export async function GET(
             { name: { equals: slug.replace(/-/g, ' ') } },
           ],
         },
-        include: { category: true },
+        include: { categories: true },
       })
     }
 
     if (!product) {
-      return NextResponse.json({ error: 'Product not found' }, { status: 404 })
+      return NextResponse.json({ error: 'Not found' }, { status: 404 })
     }
 
-    // Fetch related products from same category or bestsellers
+    const categoryIds = product.categories.map(c => c.id)
+
+    // Fetch related products
     const relatedProducts = await db.product.findMany({
       where: {
         active: true,
         id: { not: product.id },
-        OR: [
-          { categoryId: product.categoryId },
-          { featured: true },
-        ],
+        categories: { some: { id: { in: categoryIds } } },
       },
-      include: { category: true },
       take: 4,
     })
 
