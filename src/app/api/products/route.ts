@@ -65,9 +65,9 @@ export async function GET(req: NextRequest) {
       orderBy: [{ featured: 'desc' }, { createdAt: 'desc' }],
     })
     return NextResponse.json({ products })
-  } catch (e) {
+  } catch (e: any) {
     console.error('GET /api/products error:', e)
-    return NextResponse.json({ products: [] })
+    return NextResponse.json({ products: [], error: e?.message || String(e) })
   }
 }
 

@@ -1,6 +1,10 @@
 const { createServer } = require('http')
 const { parse } = require('url')
 const next = require('next')
+const { loadEnvConfig } = require('@next/env')
+
+// Load environment variables from .env
+loadEnvConfig(process.cwd())
 
 const dev = false
 const hostname = 'localhost'
