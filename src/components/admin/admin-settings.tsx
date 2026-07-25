@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Save, Loader2, Store, MessageCircle, Image as ImageIcon, Lock, Megaphone } from 'lucide-react'
+import { Save, Loader2, Store, MessageCircle, Image as ImageIcon, Lock, Megaphone, Plus, Trash2, Upload } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -24,10 +24,22 @@ export function AdminSettings({
     whatsappNumber: settings.whatsappNumber,
     freeShipThreshold: String(settings.freeShipThreshold),
     announcement: settings.announcement || '',
-    heroImage: settings.heroImage || '',
     adminPin: '',
   })
+  
+  const parseHeroImages = (val: string | null) => {
+    if (!val) return []
+    try {
+      const parsed = JSON.parse(val)
+      return Array.isArray(parsed) ? parsed : [val]
+    } catch {
+      return [val]
+    }
+  }
+
+  const [heroImages, setHeroImages] = useState<string[]>(parseHeroImages(settings.heroImage))
   const [saving, setSaving] = useState(false)
+  const [uploading, setUploading] = useState(false)
 
   useEffect(() => {
     setForm({
@@ -36,9 +48,9 @@ export function AdminSettings({
       whatsappNumber: settings.whatsappNumber,
       freeShipThreshold: String(settings.freeShipThreshold),
       announcement: settings.announcement || '',
-      heroImage: settings.heroImage || '',
       adminPin: '',
     })
+    setHeroImages(parseHeroImages(settings.heroImage))
   }, [settings])
 
   const save = async () => {
@@ -50,7 +62,7 @@ export function AdminSettings({
         whatsappNumber: form.whatsappNumber.replace(/\D/g, ''),
         freeShipThreshold: Number(form.freeShipThreshold),
         announcement: form.announcement || null,
-        heroImage: form.heroImage || null,
+        heroImage: heroImages.length > 0 ? JSON.stringify(heroImages) : null,
       }
       if (form.adminPin) payload.adminPin = form.adminPin
       const { settings: updated } = await api.updateSettings(payload)
@@ -61,6 +73,26 @@ export function AdminSettings({
       toast.error('Failed to save settings')
     } finally {
       setSaving(false)
+    }
+  }
+
+  const handleHeroUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    try {
+      const fd = new FormData()
+      fd.append('file', file)
+      const res = await fetch('/api/products', { method: 'POST', body: fd })
+      if (!res.ok) throw new Error('Upload failed')
+      const data = await res.json()
+      setHeroImages((prev) => [...prev, data.url])
+      toast.success('Hero image uploaded')
+    } catch (err) {
+      toast.error('Failed to upload hero image')
+    } finally {
+      setUploading(false)
+      e.target.value = ''
     }
   }
 
@@ -122,21 +154,68 @@ export function AdminSettings({
         </CardContent>
       </Card>
 
-      {/* Hero image */}
+      {/* Hero images */}
       <Card className="shadow-sm">
-        <CardHeader className="pb-3">
+        <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-base flex items-center gap-2">
-            <ImageIcon className="h-4 w-4 text-primary" /> Hero Banner Image
+            <ImageIcon className="h-4 w-4 text-primary" /> Hero Banner Images
           </CardTitle>
+          <div className="relative">
+            <Button size="sm" variant="outline" disabled={uploading}>
+              {uploading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Upload className="h-4 w-4 mr-2" />}
+              Upload Image
+            </Button>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleHeroUpload}
+              className="absolute inset-0 opacity-0 cursor-pointer"
+              disabled={uploading}
+            />
+          </div>
         </CardHeader>
         <CardContent className="grid gap-3">
           <div className="grid gap-1.5">
-            <Label>Image URL</Label>
-            <Input value={form.heroImage} onChange={(e) => setForm({ ...form, heroImage: e.target.value })} placeholder="https://…" />
+            <Label>Direct URL (Optional)</Label>
+            <div className="flex gap-2">
+              <Input id="hero-url" placeholder="https://..." onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  const val = e.currentTarget.value
+                  if (val) {
+                    setHeroImages((p) => [...p, val])
+                    e.currentTarget.value = ''
+                  }
+                }
+              }} />
+              <Button type="button" variant="secondary" onClick={() => {
+                const el = document.getElementById('hero-url') as HTMLInputElement
+                if (el.value) {
+                  setHeroImages((p) => [...p, el.value])
+                  el.value = ''
+                }
+              }}>Add</Button>
+            </div>
+            <p className="text-xs text-muted-foreground">Or add a direct URL and click Add. You can add up to 5 images for a slider.</p>
           </div>
-          {form.heroImage && (
-             
-            <img src={form.heroImage} alt="hero preview" className="h-32 w-full object-cover rounded-lg border border-border" />
+          
+          {heroImages.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
+              {heroImages.map((img, i) => (
+                <div key={i} className="relative group rounded-lg overflow-hidden border border-border">
+                  <img src={img} alt={`hero ${i}`} className="h-32 w-full object-cover" />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => setHeroImages(heroImages.filter((_, idx) => idx !== i))}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </CardContent>
       </Card>
