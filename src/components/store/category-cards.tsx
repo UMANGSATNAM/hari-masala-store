@@ -29,8 +29,8 @@ export function CategoryCards({
   const countFor = (slug: string) =>
     products.filter((p) => p.categories?.some((c: any) => c.slug === slug) || p.category?.slug === slug).length
 
-  // Show top 5 categories as cards (like reference)
-  const cards = categories.slice(0, 5)
+  // Show all categories as cards
+  const cards = categories
 
   return (
     <section id="categories" className="bg-white border-t border-border scroll-mt-20">
