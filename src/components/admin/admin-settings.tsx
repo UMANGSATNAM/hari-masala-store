@@ -154,20 +154,20 @@ export function AdminSettings({
         </CardContent>
       </Card>
 
-      {/* Hero image */}
+      {/* Hero Banner Media */}
       <Card className="shadow-sm">
         <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
           <CardTitle className="text-base flex items-center gap-2">
-            <ImageIcon className="h-4 w-4 text-primary" /> Hero Banner Image
+            <ImageIcon className="h-4 w-4 text-primary" /> Hero Banner Media
           </CardTitle>
           <div className="relative">
             <Button size="sm" variant="outline" disabled={uploading}>
               {uploading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Upload className="h-4 w-4 mr-2" />}
-              Upload Image
+              Upload Image/Video
             </Button>
             <input
               type="file"
-              accept="image/*"
+              accept="image/*,video/mp4,video/webm"
               onChange={handleHeroUpload}
               className="absolute inset-0 opacity-0 cursor-pointer"
               disabled={uploading}
@@ -175,14 +175,13 @@ export function AdminSettings({
           </div>
         </CardHeader>
         <CardContent className="grid gap-3">
-          <div className="grid gap-1.5">
-            <Label>Image URL (Optional)</Label>
-            <Input value={form.heroImage} onChange={(e) => setForm({ ...form, heroImage: e.target.value })} placeholder="https://…" />
-          </div>
-          
           {form.heroImage && (
             <div className="relative group rounded-lg overflow-hidden border border-border mt-2">
-              <img src={form.heroImage} alt="hero preview" className="h-auto w-full object-cover max-h-64" />
+              {form.heroImage.match(/\.(mp4|webm)$/i) ? (
+                <video src={form.heroImage} autoPlay loop muted playsInline className="h-auto w-full object-cover max-h-64" />
+              ) : (
+                <img src={form.heroImage} alt="hero preview" className="h-auto w-full object-cover max-h-64" />
+              )}
               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                 <Button
                   size="sm"

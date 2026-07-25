@@ -17,12 +17,12 @@ async function handleUpload(req: NextRequest) {
     if (!file) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })
     }
-    const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/jpg']
+    const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/jpg', 'video/mp4', 'video/webm']
     if (!allowed.includes(file.type)) {
-      return NextResponse.json({ error: 'Only JPG, PNG, WEBP, GIF allowed' }, { status: 400 })
+      return NextResponse.json({ error: 'Only JPG, PNG, WEBP, GIF, MP4, WEBM allowed' }, { status: 400 })
     }
-    if (file.size > 5 * 1024 * 1024) {
-      return NextResponse.json({ error: 'File too large (max 5MB)' }, { status: 400 })
+    if (file.size > 25 * 1024 * 1024) {
+      return NextResponse.json({ error: 'File too large (max 25MB)' }, { status: 400 })
     }
     const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg'
     const filename = `${randomUUID()}.${ext}`

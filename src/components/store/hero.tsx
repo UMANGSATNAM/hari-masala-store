@@ -24,11 +24,22 @@ export function Hero({ settings }: { settings: Settings }) {
         {/* Main Hero Banner Image */}
         <div className="mt-2 relative overflow-hidden rounded-2xl w-full shadow-sm hover:shadow-md transition-shadow">
           <a href="#categories" className="block w-full leading-none">
-            <img 
-              src={imageSrc} 
-              alt="Hari Masala - Banner" 
-              className="w-full h-auto block"
-            />
+            {imageSrc.match(/\.(mp4|webm)$/i) ? (
+              <video 
+                src={imageSrc} 
+                autoPlay 
+                loop 
+                muted 
+                playsInline 
+                className="w-full h-auto block"
+              />
+            ) : (
+              <img 
+                src={imageSrc} 
+                alt="Hari Masala - Banner" 
+                className="w-full h-auto block"
+              />
+            )}
           </a>
         </div>
 
