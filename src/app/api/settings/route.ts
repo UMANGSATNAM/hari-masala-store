@@ -19,6 +19,7 @@ export async function GET() {
           adminPin: '',
           heroImage: null,
           announcement: null,
+          logoImage: null,
         },
       })
     }
@@ -36,6 +37,7 @@ export async function GET() {
         adminPin: '',
         heroImage: null,
         announcement: null,
+        logoImage: null,
       },
     })
   }
@@ -45,7 +47,7 @@ export async function PUT(req: NextRequest) {
   try {
     const body = await req.json()
     const data: Record<string, unknown> = {}
-    const fields = ['storeName', 'storeTagline', 'whatsappNumber', 'announcement', 'heroImage']
+    const fields = ['storeName', 'storeTagline', 'whatsappNumber', 'announcement', 'heroImage', 'logoImage']
     for (const f of fields) {
       if (body[f] !== undefined) data[f] = body[f]
     }
@@ -67,6 +69,7 @@ export async function PUT(req: NextRequest) {
         freeShipThreshold: Number(body.freeShipThreshold) || 499,
         announcement: body.announcement || null,
         heroImage: body.heroImage || null,
+        logoImage: body.logoImage || null,
         ...(body.adminPin ? { adminPin: body.adminPin } : {}),
       },
     })
