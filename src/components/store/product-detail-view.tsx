@@ -215,7 +215,7 @@ export function ProductDetailView({
                 )}
               </div>
               <p className="text-xs text-muted-foreground font-medium">
-                Pack Size: <span className="font-bold text-foreground">{selectedVariant.weight}</span> · Inclusive of all taxes · Free delivery on orders above ₹{settings.freeShipThreshold}
+                Pack Size: <span className="font-bold text-foreground">{selectedVariant.weight}</span> · Inclusive of all taxes
               </p>
             </div>
 

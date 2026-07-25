@@ -145,7 +145,7 @@ export function AdminSettings({
           </div>
           <div className="grid gap-1.5">
             <Label className="flex items-center gap-1.5"><Megaphone className="h-3.5 w-3.5" /> Announcement Bar</Label>
-            <Input value={form.announcement} onChange={(e) => setForm({ ...form, announcement: e.target.value })} placeholder="e.g. Free delivery above ₹499" />
+            <Input value={form.announcement} onChange={(e) => setForm({ ...form, announcement: e.target.value })} placeholder="e.g. 10% off on first order" />
           </div>
         </CardContent>
       </Card>
@@ -166,14 +166,6 @@ export function AdminSettings({
               placeholder="e.g. 919879873113"
             />
             <p className="text-xs text-muted-foreground">Orders will be sent to this number.</p>
-          </div>
-          <div className="grid gap-1.5">
-            <Label>Free Delivery Threshold (₹)</Label>
-            <Input
-              type="number"
-              value={form.freeShipThreshold}
-              onChange={(e) => setForm({ ...form, freeShipThreshold: e.target.value })}
-            />
           </div>
         </CardContent>
       </Card>

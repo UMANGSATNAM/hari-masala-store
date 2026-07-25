@@ -23,9 +23,6 @@ export function CartDrawer({
 }) {
   const { items, isOpen, setOpen, setQty, remove, subtotal, clear } = useCart()
   const total = subtotal()
-  const threshold = settings.freeShipThreshold
-  const remaining = Math.max(0, threshold - total)
-  const progress = Math.min(100, (total / threshold) * 100)
 
   return (
     <Sheet open={isOpen} onOpenChange={setOpen}>
