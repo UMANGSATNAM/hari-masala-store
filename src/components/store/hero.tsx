@@ -81,22 +81,22 @@ export function Hero({ settings }: { settings: Settings }) {
         </div>
 
         {/* Trust badges row */}
-        <div className="mt-6 grid grid-cols-3 gap-3">
+        <div className="mt-6 grid grid-cols-3 gap-2 sm:gap-3">
           {[
-            { icon: ShieldCheck, label: '100% Pure & Natural', sub: 'No fillers' },
-            { icon: Truck, label: 'WhatsApp Ordering', sub: 'COD available' },
+            { icon: ShieldCheck, label: '100% Pure', sub: 'No fillers' },
+            { icon: Truck, label: 'WhatsApp', sub: 'Order easily' },
             { icon: Leaf, label: 'Farm Fresh', sub: 'From Unjha' },
           ].map((b) => (
             <div
               key={b.label}
-              className="flex items-center gap-2.5 rounded-xl border border-border bg-white px-3 py-2.5 shadow-sm"
+              className="flex flex-col sm:flex-row items-center text-center sm:text-left gap-1.5 sm:gap-2.5 rounded-xl border border-border bg-white p-2 sm:px-3 sm:py-2.5 shadow-sm"
             >
-              <div className="grid place-items-center h-9 w-9 shrink-0 rounded-lg bg-primary-gradient text-primary-foreground">
-                <b.icon className="h-4 w-4" />
+              <div className="grid place-items-center h-8 w-8 sm:h-9 sm:w-9 shrink-0 rounded-lg bg-primary-gradient text-primary-foreground">
+                <b.icon className="h-4 w-4 sm:h-4 sm:w-4" />
               </div>
               <div className="min-w-0">
-                <p className="text-xs sm:text-sm font-semibold text-foreground truncate">{b.label}</p>
-                <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{b.sub}</p>
+                <p className="text-[10px] leading-tight sm:text-sm font-semibold text-foreground">{b.label}</p>
+                <p className="text-[9px] leading-tight sm:text-xs text-muted-foreground mt-0.5">{b.sub}</p>
               </div>
             </div>
           ))}
