@@ -18,15 +18,17 @@ export function AdminSettings({
   settings: Settings
   onSaved: (s: Settings) => void
 }) {
-  const parseHeroImage = (val: string | null) => {
-    if (!val) return ''
+  const parseHeroImages = (val: string | null) => {
+    if (!val) return []
     try {
       const parsed = JSON.parse(val)
-      return Array.isArray(parsed) ? (parsed[0] || '') : val
+      return Array.isArray(parsed) ? parsed : [val]
     } catch {
-      return val
+      return [val]
     }
   }
+
+  const [heroImages, setHeroImages] = useState<string[]>(parseHeroImages(settings.heroImage))
 
   const [form, setForm] = useState({
     storeName: settings.storeName,
@@ -34,7 +36,6 @@ export function AdminSettings({
     whatsappNumber: settings.whatsappNumber,
     freeShipThreshold: String(settings.freeShipThreshold),
     announcement: settings.announcement || '',
-    heroImage: parseHeroImage(settings.heroImage),
     adminPin: '',
   })
   
@@ -48,9 +49,9 @@ export function AdminSettings({
       whatsappNumber: settings.whatsappNumber,
       freeShipThreshold: String(settings.freeShipThreshold),
       announcement: settings.announcement || '',
-      heroImage: parseHeroImage(settings.heroImage),
       adminPin: '',
     })
+    setHeroImages(parseHeroImages(settings.heroImage))
   }, [settings])
 
   const save = async () => {
@@ -62,7 +63,7 @@ export function AdminSettings({
         whatsappNumber: form.whatsappNumber.replace(/\D/g, ''),
         freeShipThreshold: Number(form.freeShipThreshold),
         announcement: form.announcement || null,
-        heroImage: form.heroImage || null,
+        heroImage: heroImages.length > 0 ? JSON.stringify(heroImages) : null,
       }
       if (form.adminPin) payload.adminPin = form.adminPin
       const { settings: updated } = await api.updateSettings(payload)
@@ -86,8 +87,8 @@ export function AdminSettings({
       const res = await fetch('/api/products', { method: 'POST', body: fd })
       if (!res.ok) throw new Error('Upload failed')
       const data = await res.json()
-      setForm((prev) => ({ ...prev, heroImage: data.url }))
-      toast.success('Hero image uploaded')
+      setHeroImages((prev) => [...prev, data.url])
+      toast.success('Media uploaded')
     } catch (err) {
       toast.error('Failed to upload hero image')
     } finally {
@@ -175,22 +176,26 @@ export function AdminSettings({
           </div>
         </CardHeader>
         <CardContent className="grid gap-3">
-          {form.heroImage && (
-            <div className="relative group rounded-lg overflow-hidden border border-border mt-2">
-              {form.heroImage.match(/\.(mp4|webm)$/i) ? (
-                <video src={form.heroImage} autoPlay loop muted playsInline className="h-auto w-full object-cover max-h-64" />
-              ) : (
-                <img src={form.heroImage} alt="hero preview" className="h-auto w-full object-cover max-h-64" />
-              )}
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                <Button
-                  size="sm"
-                  variant="destructive"
-                  onClick={() => setForm((prev) => ({ ...prev, heroImage: '' }))}
-                >
-                  <Trash2 className="h-4 w-4 mr-2" /> Remove
-                </Button>
-              </div>
+          {heroImages.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
+              {heroImages.map((src, i) => (
+                <div key={i} className="relative group rounded-lg overflow-hidden border border-border">
+                  {src.match(/\.(mp4|webm)$/i) ? (
+                    <video src={src} autoPlay loop muted playsInline className="h-32 w-full object-cover" />
+                  ) : (
+                    <img src={src} alt={`hero preview ${i}`} className="h-32 w-full object-cover" />
+                  )}
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => setHeroImages(heroImages.filter((_, idx) => idx !== i))}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </CardContent>
