@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import type { OrderItem } from '@/lib/types'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+export const fetchCache = 'force-no-store'
+
 function genOrderNumber() {
   const d = new Date()
   const y = d.getFullYear().toString().slice(-2)

@@ -124,7 +124,10 @@ export function AdminProducts({ categories, onCategoryAdded }: { categories: Cat
   const loadAll = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await fetch('/api/products?category=all')
+      const res = await fetch('/api/products?category=all', {
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' },
+      })
       const data = await res.json()
       setProducts(data.products || [])
     } catch {

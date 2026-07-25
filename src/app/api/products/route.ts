@@ -5,6 +5,10 @@ import { writeFile, mkdir } from 'fs/promises'
 import path from 'path'
 import { randomUUID } from 'crypto'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+export const fetchCache = 'force-no-store'
+
 // Handle image upload when Content-Type is multipart/form-data
 async function handleUpload(req: NextRequest) {
   try {

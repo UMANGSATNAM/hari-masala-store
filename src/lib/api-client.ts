@@ -2,8 +2,15 @@ import type { Category, Order, Product, Settings } from './types'
 
 async function jfetch<T>(url: string, init?: RequestInit): Promise<T> {
   const res = await fetch(url, {
-    headers: { 'Content-Type': 'application/json' },
+    cache: 'no-store',
     ...init,
+    headers: {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0',
+      ...init?.headers,
+    },
   })
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
