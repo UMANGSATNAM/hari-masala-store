@@ -193,12 +193,10 @@ async function main() {
     },
   })
 
-  // Check if categories already exist before seeding to prevent overwriting
-  const existingCategories = await db.category.count()
-  if (existingCategories > 0) {
-    console.log('Categories already exist, skipping seed to prevent data loss.')
-    return
-  }
+  // Delete existing to allow fresh seed
+  await db.product.deleteMany()
+  await db.category.deleteMany()
+  console.log('Cleared existing products and categories')
   
   // Create categories
   const catMap: Record<string, string> = {}
