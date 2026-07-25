@@ -50,7 +50,9 @@ export function CheckoutDialog({
   const [done, setDone] = useState(false)
 
   const total = subtotal()
-  const deliveryCharge = form.state === 'Gujarat' ? calculateDeliveryCharge(items) : undefined
+  const isMumbai = form.state === 'Maharashtra' && form.city.trim().toLowerCase() === 'mumbai'
+  const hasKnownDeliveryCharge = form.state === 'Gujarat' || isMumbai
+  const deliveryCharge = hasKnownDeliveryCharge ? calculateDeliveryCharge(items, form.state, form.city) : undefined
   const finalTotal = deliveryCharge !== undefined ? total + deliveryCharge : total
 
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
@@ -180,20 +182,20 @@ export function CheckoutDialog({
                 <span>Subtotal</span>
                 <span>{formatINR(total)}</span>
               </div>
-              {form.state === 'Gujarat' && deliveryCharge !== undefined && (
+              {hasKnownDeliveryCharge && deliveryCharge !== undefined && (
                 <div className="flex justify-between text-sm mt-1 font-medium">
                   <span>Delivery Charge</span>
                   <span>{formatINR(deliveryCharge)}</span>
                 </div>
               )}
-              {form.state !== 'Gujarat' && (
+              {!hasKnownDeliveryCharge && (
                 <div className="text-xs text-muted-foreground mt-1">
                   * Other state delivery charge will be given in WhatsApp after order.
                 </div>
               )}
               <div className="mt-2 pt-2 border-t border-border flex justify-between font-bold text-primary text-lg">
                 <span>Total</span>
-                <span>{form.state === 'Gujarat' && deliveryCharge !== undefined ? formatINR(finalTotal) : formatINR(total)}</span>
+                <span>{hasKnownDeliveryCharge && deliveryCharge !== undefined ? formatINR(finalTotal) : formatINR(total)}</span>
               </div>
             </div>
 

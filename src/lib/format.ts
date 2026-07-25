@@ -34,13 +34,22 @@ export function parseWeightToGrams(weight: string): number {
   return num
 }
 
-export function calculateDeliveryCharge(items: {weight: string, quantity: number}[]): number {
+export function calculateDeliveryCharge(
+  items: {weight: string, quantity: number}[],
+  state?: string,
+  city?: string
+): number {
   let totalGrams = 0
   for (const item of items) {
     totalGrams += parseWeightToGrams(item.weight) * item.quantity
   }
   if (totalGrams === 0) return 0
   const totalKg = Math.ceil(totalGrams / 1000)
+  
+  if (state === 'Maharashtra' && city?.toLowerCase().trim() === 'mumbai') {
+    return totalKg * 30
+  }
+  
   return totalKg * 20
 }
 
@@ -80,11 +89,13 @@ export function buildWhatsAppOrder(args: {
     lines.push(`* ${guj} (${it.weight}) x${it.quantity} = ${formatINR(it.price * it.quantity)}`)
   })
   lines.push('')
-  if (customer.state === 'Gujarat' && deliveryCharge !== undefined) {
+  const isMumbai = customer.state === 'Maharashtra' && customer.city?.toLowerCase().trim() === 'mumbai'
+  const hasKnownDeliveryCharge = customer.state === 'Gujarat' || isMumbai
+  if (hasKnownDeliveryCharge && deliveryCharge !== undefined) {
     lines.push(`Products Total: ${formatINR(subtotal)}`)
     lines.push(`Delivery Charge: ${formatINR(deliveryCharge)}`)
     lines.push(`Full Total: ${formatINR(subtotal + deliveryCharge)}`)
-  } else if (customer.state !== 'Gujarat') {
+  } else if (!hasKnownDeliveryCharge) {
     lines.push(`Products Total: ${formatINR(subtotal)}`)
     lines.push('Other state delivery charge will be given in whatsapp after getting order')
   } else {
