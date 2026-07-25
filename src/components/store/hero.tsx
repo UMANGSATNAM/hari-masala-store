@@ -18,7 +18,7 @@ export function Hero({ settings }: { settings: Settings }) {
               Note: The image should be saved as 'hero-banner.jpg' in the 'public' folder. 
             */}
             <img 
-              src="/hero-banner.jpg" 
+              src={settings.heroImage || "/hero-banner.jpg"} 
               alt="Hari Masala - The Pure Taste of Unjha" 
               className="w-full h-auto object-cover"
             />

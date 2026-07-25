@@ -45,23 +45,38 @@ export async function GET(req: NextRequest) {
 
   const where: Record<string, unknown> = { active: true }
   if (category && category !== 'all') {
-    where.categories = { some: { slug: category } }
+    where.OR = [
+      { categories: { some: { slug: category } } },
+      { category: { slug: category } }
+    ]
   }
   if (featured === 'true') {
     where.featured = true
   }
   if (search) {
-    where.OR = [
-      { name: { contains: search } },
-      { gujaratiName: { contains: search } },
-      { description: { contains: search } },
-    ]
+    if (where.OR) {
+      where.AND = [
+        { OR: where.OR },
+        { OR: [
+          { name: { contains: search } },
+          { gujaratiName: { contains: search } },
+          { description: { contains: search } },
+        ] }
+      ]
+      delete where.OR
+    } else {
+      where.OR = [
+        { name: { contains: search } },
+        { gujaratiName: { contains: search } },
+        { description: { contains: search } },
+      ]
+    }
   }
 
   try {
     const products = await db.product.findMany({
       where,
-      include: { categories: true },
+      include: { categories: true, category: true },
       orderBy: [{ featured: 'desc' }, { createdAt: 'desc' }],
     })
     return NextResponse.json({ products })
