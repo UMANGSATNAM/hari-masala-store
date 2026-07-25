@@ -33,6 +33,7 @@ export default function Home() {
           adminPin: '',
           heroImage: null,
           announcement: null,
+          logoImage: null,
         })
         setCategories(c?.categories || [])
         setProducts(p?.products || [])
@@ -48,6 +49,7 @@ export default function Home() {
           adminPin: '',
           heroImage: null,
           announcement: null,
+          logoImage: null,
         })
       })
       .finally(() => setLoading(false))

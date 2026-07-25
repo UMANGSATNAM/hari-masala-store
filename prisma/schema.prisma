@@ -67,4 +67,5 @@ model Settings {
   adminPin       String  @default("1234")
   heroImage      String?
   announcement   String?
+  logoImage      String?
 }

@@ -44,17 +44,23 @@ export function StoreHeader({
         <div className="flex h-16 items-center gap-3">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 shrink-0">
-            <span className="grid place-items-center h-9 w-9 rounded-full bg-primary-gradient text-primary-foreground shadow-sm">
-              <Flame className="h-5 w-5" />
-            </span>
-            <span className="flex flex-col leading-none">
-              <span className="font-extrabold text-lg tracking-tight text-foreground">
-                Hari<span className="text-primary"> Masala</span>
-              </span>
-              <span className="text-[10px] text-primary hidden sm:block font-medium">
-                Pure & Authentic Spices
-              </span>
-            </span>
+            {settings.logoImage ? (
+              <img src={settings.logoImage} alt={settings.storeName} className="h-10 w-auto object-contain" />
+            ) : (
+              <>
+                <span className="grid place-items-center h-9 w-9 rounded-full bg-primary-gradient text-primary-foreground shadow-sm">
+                  <Flame className="h-5 w-5" />
+                </span>
+                <span className="flex flex-col leading-none">
+                  <span className="font-extrabold text-lg tracking-tight text-foreground">
+                    Hari<span className="text-primary"> Masala</span>
+                  </span>
+                  <span className="text-[10px] text-primary hidden sm:block font-medium">
+                    Pure & Authentic Spices
+                  </span>
+                </span>
+              </>
+            )}
           </Link>
 
           {/* Search bar (desktop, centered) */}

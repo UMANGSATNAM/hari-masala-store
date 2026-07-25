@@ -81,6 +81,7 @@ export type Settings = {
   adminPin: string
   heroImage: string | null
   announcement: string | null
+  logoImage: string | null
 }
 
 export const ORDER_STATUSES = ['PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCELLED'] as const

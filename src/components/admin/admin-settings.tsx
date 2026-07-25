@@ -36,6 +36,7 @@ export function AdminSettings({
     whatsappNumber: settings.whatsappNumber,
     freeShipThreshold: String(settings.freeShipThreshold),
     announcement: settings.announcement || '',
+    logoImage: settings.logoImage || '',
     adminPin: '',
   })
   
@@ -49,6 +50,7 @@ export function AdminSettings({
       whatsappNumber: settings.whatsappNumber,
       freeShipThreshold: String(settings.freeShipThreshold),
       announcement: settings.announcement || '',
+      logoImage: settings.logoImage || '',
       adminPin: '',
     })
     setHeroImages(parseHeroImages(settings.heroImage))
@@ -63,6 +65,7 @@ export function AdminSettings({
         whatsappNumber: form.whatsappNumber.replace(/\D/g, ''),
         freeShipThreshold: Number(form.freeShipThreshold),
         announcement: form.announcement || null,
+        logoImage: form.logoImage || null,
         heroImage: heroImages.length > 0 ? JSON.stringify(heroImages) : null,
       }
       if (form.adminPin) payload.adminPin = form.adminPin
@@ -91,6 +94,26 @@ export function AdminSettings({
       toast.success('Media uploaded')
     } catch (err) {
       toast.error('Failed to upload hero image')
+    } finally {
+      setUploading(false)
+      e.target.value = ''
+    }
+  }
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    try {
+      const fd = new FormData()
+      fd.append('file', file)
+      const res = await fetch('/api/products', { method: 'POST', body: fd })
+      if (!res.ok) throw new Error('Upload failed')
+      const data = await res.json()
+      setForm((prev) => ({ ...prev, logoImage: data.url }))
+      toast.success('Store logo uploaded')
+    } catch (err) {
+      toast.error('Failed to upload store logo')
     } finally {
       setUploading(false)
       e.target.value = ''
@@ -152,6 +175,44 @@ export function AdminSettings({
               onChange={(e) => setForm({ ...form, freeShipThreshold: e.target.value })}
             />
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Store Logo */}
+      <Card className="shadow-sm">
+        <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Store className="h-4 w-4 text-primary" /> Store Logo
+          </CardTitle>
+          <div className="relative">
+            <Button size="sm" variant="outline" disabled={uploading}>
+              {uploading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Upload className="h-4 w-4 mr-2" />}
+              Upload Logo
+            </Button>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleLogoUpload}
+              className="absolute inset-0 opacity-0 cursor-pointer"
+              disabled={uploading}
+            />
+          </div>
+        </CardHeader>
+        <CardContent className="grid gap-3">
+          {form.logoImage && (
+            <div className="relative group rounded-lg overflow-hidden border border-border mt-2 w-32 h-32 bg-muted/50 grid place-items-center p-2">
+              <img src={form.logoImage} alt="logo preview" className="max-h-full max-w-full object-contain" />
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => setForm((prev) => ({ ...prev, logoImage: '' }))}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
