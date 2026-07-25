@@ -45,7 +45,7 @@ export function StoreHeader({
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 shrink-0">
             {settings.logoImage ? (
-              <img src={settings.logoImage} alt={settings.storeName} className="h-16 w-auto object-contain scale-[1.6] sm:scale-[2.5] origin-left" />
+              <img src={settings.logoImage} alt={settings.storeName} className="h-16 w-auto object-contain scale-[180%] sm:scale-[250%] origin-left" />
             ) : (
               <>
                 <span className="grid place-items-center h-9 w-9 rounded-full bg-primary-gradient text-primary-foreground shadow-sm">
