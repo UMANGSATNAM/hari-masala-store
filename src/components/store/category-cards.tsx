@@ -27,7 +27,7 @@ export function CategoryCards({
 }) {
   // Count products per category
   const countFor = (slug: string) =>
-    products.filter((p) => p.category?.slug === slug).length
+    products.filter((p) => p.categories?.some((c: any) => c.slug === slug) || p.category?.slug === slug).length
 
   // Show top 5 categories as cards (like reference)
   const cards = categories.slice(0, 5)
