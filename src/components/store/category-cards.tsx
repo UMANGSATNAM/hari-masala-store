@@ -46,14 +46,14 @@ export function CategoryCards({
           </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+        <div className="flex overflow-x-auto snap-x snap-mandatory pb-4 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {cards.map((c) => {
             const isDark = CAT_COLORS[c.slug] === 'bg-primary-gradient'
             return (
               <button
                 key={c.id}
                 onClick={() => onSelect(c.slug)}
-                className="group relative overflow-hidden rounded-xl border border-border bg-white p-4 text-left shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5"
+                className="group relative shrink-0 w-[140px] sm:w-auto snap-start overflow-hidden rounded-xl border border-border bg-white p-4 text-left shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5"
               >
                 <div
                   className={`grid place-items-center h-14 w-14 sm:h-16 sm:w-16 rounded-full ${

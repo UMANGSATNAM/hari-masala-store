@@ -10,9 +10,15 @@ export async function GET() {
   try {
     const categories = await db.category.findMany({
       orderBy: { sortOrder: 'asc' },
-      include: { _count: { select: { products: true } } },
+      include: { _count: { select: { products: true, primaryProducts: true } } },
     })
-    return NextResponse.json({ categories })
+    const mapped = categories.map(c => ({
+      ...c,
+      _count: {
+        products: c._count.products + c._count.primaryProducts
+      }
+    }))
+    return NextResponse.json({ categories: mapped })
   } catch (e) {
     console.error('GET /api/categories error:', e)
     return NextResponse.json({ categories: [] })
