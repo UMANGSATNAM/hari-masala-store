@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import prisma from '@/lib/prisma'
+import { db as prisma } from '@/lib/db'
 import * as xlsx from 'xlsx'
 
 export async function GET(req: NextRequest) {
