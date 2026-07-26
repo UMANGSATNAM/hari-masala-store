@@ -129,7 +129,7 @@ export function CheckoutDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="flex flex-col gap-0 p-0 w-[95vw] sm:w-full sm:max-w-lg max-h-[90dvh] overflow-hidden rounded-xl">
+      <DialogContent className="flex flex-col gap-0 p-0 w-[95vw] h-[90dvh] sm:h-auto sm:w-full sm:max-w-lg sm:max-h-[90dvh] overflow-hidden rounded-xl">
         <DialogHeader className="px-4 py-4 sm:px-6 border-b border-border shrink-0 bg-background/95 backdrop-blur z-10 rounded-t-xl">
           <DialogTitle className="flex items-center gap-2">
             <ShoppingCart className="h-5 w-5 text-primary" />
