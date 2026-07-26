@@ -57,6 +57,7 @@ export function buildWhatsAppOrder(args: {
   items: CartItem[]
   subtotal: number
   settings: Settings
+  orderNumber?: string
   customer: {
     name: string
     phone: string
@@ -68,7 +69,7 @@ export function buildWhatsAppOrder(args: {
   }
   deliveryCharge?: number
 }): { text: string; url: string } {
-  const { items, subtotal, settings, customer, deliveryCharge } = args
+  const { items, subtotal, settings, customer, deliveryCharge, orderNumber } = args
 
   // Address line: "address, city, state - pincode"
   const addrParts: string[] = [customer.address.trim()]
@@ -78,6 +79,9 @@ export function buildWhatsAppOrder(args: {
 
   const lines: string[] = []
   lines.push(`New Order — ${settings.storeName}`)
+  if (orderNumber) {
+    lines.push(`Order ID: ${orderNumber}`)
+  }
   lines.push('')
   lines.push(`Name: ${customer.name}`)
   lines.push(`Mobile: ${customer.phone}`)

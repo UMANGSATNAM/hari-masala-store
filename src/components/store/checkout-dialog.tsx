@@ -79,7 +79,7 @@ export function CheckoutDialog({
         weight: i.weight,
       }))
 
-      await api.createOrder({
+      const { order } = await api.createOrder({
         customerName: form.name.trim(),
         customerPhone: form.phone.trim(),
         customerAddress: form.address.trim(),
@@ -93,6 +93,7 @@ export function CheckoutDialog({
         items,
         subtotal: total,
         settings,
+        orderNumber: order.orderNumber,
         customer: {
           name: form.name.trim(),
           phone: form.phone.trim(),
@@ -128,7 +129,7 @@ export function CheckoutDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="w-[95vw] max-w-lg max-h-[90dvh] sm:max-h-[85vh] overflow-y-auto scrollbar-thin p-4 sm:p-6 rounded-xl">
+      <DialogContent className="w-full sm:max-w-lg max-h-[95dvh] sm:max-h-[90vh] overflow-y-auto scrollbar-thin rounded-t-xl sm:rounded-xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <ShoppingCart className="h-5 w-5 text-primary" />
