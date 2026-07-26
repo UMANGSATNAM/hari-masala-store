@@ -32,7 +32,6 @@ export const useCart = create<CartState>()(
             items: items.map((i) =>
               i.id === cartItemId ? { ...i, quantity: newQty } : i
             ),
-            isOpen: true,
           })
         } else {
           set({
@@ -51,7 +50,6 @@ export const useCart = create<CartState>()(
                 stock: product.stock,
               },
             ],
-            isOpen: true,
           })
         }
       },

@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { Flame, Search, ShoppingCart, Menu, X, Headphones } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useCart } from '@/lib/store'
@@ -20,6 +20,15 @@ export function StoreHeader({
   const [searchOpen, setSearchOpen] = useState(false)
   const [q, setQ] = useState('')
   const [menuOpen, setMenuOpen] = useState(false)
+  const [isPopping, setIsPopping] = useState(false)
+
+  useEffect(() => {
+    if (cartCount > 0) {
+      setIsPopping(true)
+      const t = setTimeout(() => setIsPopping(false), 300)
+      return () => clearTimeout(t)
+    }
+  }, [cartCount])
 
   const navLinks = [
     { label: 'Home', href: '/' },
@@ -113,10 +122,10 @@ export function StoreHeader({
               onClick={() => setOpen(true)}
               className="relative bg-primary-gradient hover:opacity-90 h-10 px-3"
             >
-              <ShoppingCart className="h-5 w-5 sm:mr-1.5" />
+              <ShoppingCart className={`h-5 w-5 sm:mr-1.5 transition-transform duration-200 ${isPopping ? 'scale-125' : ''}`} />
               <span className="hidden sm:inline">Cart</span>
               {cartCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 grid place-items-center min-w-5 h-5 px-1 rounded-full bg-saffron-solid text-secondary-foreground text-[11px] font-bold border-2 border-white">
+                <span className={`absolute -top-1.5 -right-1.5 grid place-items-center min-w-5 h-5 px-1 rounded-full bg-red-600 text-white text-[11px] font-bold border-2 border-white transition-transform duration-300 ${isPopping ? 'scale-125' : 'scale-100'}`}>
                   {cartCount}
                 </span>
               )}

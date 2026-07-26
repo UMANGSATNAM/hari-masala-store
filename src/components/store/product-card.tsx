@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Plus, Star, Check } from 'lucide-react'
+import { Plus, Star, Check, Minus } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -14,6 +14,7 @@ export function ProductCard({ product }: { product: Product }) {
   const add = useCart((s) => s.add)
   const [added, setAdded] = useState(false)
   const [selectedVariantIdx, setSelectedVariantIdx] = useState(0)
+  const cartItems = useCart(s => s.items)
 
   let parsedVariants = [{ weight: product.weight, price: product.price, mrp: product.mrp }]
   if (product.variants) {
@@ -24,6 +25,7 @@ export function ProductCard({ product }: { product: Product }) {
     }
   }
   const selectedVariant = parsedVariants[selectedVariantIdx]
+  const cartItem = cartItems.find(i => i.id === (selectedVariant ? `${product.id}-${selectedVariant.weight}` : product.id))
   const discount = discountPercent(selectedVariant.mrp, selectedVariant.price)
   const outOfStock = product.stock <= 0
 
@@ -136,26 +138,47 @@ export function ProductCard({ product }: { product: Product }) {
               )}
             </div>
           </div>
-          <Button
-            size="sm"
-            onClick={handleAdd}
-            disabled={outOfStock}
-            className={`w-full h-9 px-2 transition-all text-xs sm:text-sm ${
-              added
-                ? 'bg-green-600 hover:bg-green-600 text-white'
-                : 'bg-primary-gradient hover:opacity-90'
-            }`}
-          >
-            {added ? (
-              <>
-                <Check className="h-4 w-4 mr-1 shrink-0" /> Added
-              </>
-            ) : (
-              <>
-                <Plus className="h-4 w-4 mr-1 shrink-0" /> Add to Cart
-              </>
-            )}
-          </Button>
+          {cartItem ? (
+            <div className="flex items-center justify-between h-9 border border-primary rounded-md bg-primary/5 w-full">
+              <button
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); useCart.getState().setQty(cartItem.id, cartItem.quantity - 1) }}
+                className="h-full px-3 sm:px-4 text-primary hover:bg-primary/10 rounded-l-md transition-colors"
+              >
+                <Minus className="h-4 w-4" />
+              </button>
+              <span className="font-bold text-sm text-foreground flex-1 text-center">
+                {cartItem.quantity} <span className="text-xs font-normal text-muted-foreground ml-0.5">in cart</span>
+              </span>
+              <button
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); useCart.getState().setQty(cartItem.id, cartItem.quantity + 1) }}
+                disabled={cartItem.quantity >= product.stock}
+                className="h-full px-3 sm:px-4 text-primary hover:bg-primary/10 rounded-r-md disabled:opacity-40 transition-colors"
+              >
+                <Plus className="h-4 w-4" />
+              </button>
+            </div>
+          ) : (
+            <Button
+              size="sm"
+              onClick={handleAdd}
+              disabled={outOfStock}
+              className={`w-full h-9 px-2 transition-all text-xs sm:text-sm ${
+                added
+                  ? 'bg-green-600 hover:bg-green-600 text-white'
+                  : 'bg-primary-gradient hover:opacity-90'
+              }`}
+            >
+              {added ? (
+                <>
+                  <Check className="h-4 w-4 mr-1 shrink-0" /> Added
+                </>
+              ) : (
+                <>
+                  <Plus className="h-4 w-4 mr-1 shrink-0" /> Add to Cart
+                </>
+              )}
+            </Button>
+          )}
         </div>
       </div>
     </div>

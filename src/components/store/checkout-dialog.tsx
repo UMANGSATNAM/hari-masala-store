@@ -128,7 +128,7 @@ export function CheckoutDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-lg max-h-[92vh] overflow-y-auto scrollbar-thin">
+      <DialogContent className="w-[95vw] max-w-lg max-h-[90dvh] sm:max-h-[85vh] overflow-y-auto scrollbar-thin p-4 sm:p-6 rounded-xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <ShoppingCart className="h-5 w-5 text-primary" />

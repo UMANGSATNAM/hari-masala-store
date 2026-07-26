@@ -127,7 +127,12 @@ export function AdminOrders({ settings }: { settings: Settings }) {
                     <p className="font-medium text-foreground">{o.customerName}</p>
                     <p className="text-xs text-muted-foreground">{o.customerPhone}</p>
                   </td>
-                  <td className="px-4 py-2.5 text-muted-foreground">{o.itemCount}</td>
+                  <td className="px-4 py-2.5">
+                    <p className="text-muted-foreground">{o.itemCount} items</p>
+                    <p className="text-[10px] text-muted-foreground/70 truncate max-w-[150px]" title={parseItems(o).map(it => it.name).join(', ')}>
+                      {parseItems(o).map(it => it.name).join(', ')}
+                    </p>
+                  </td>
                   <td className="px-4 py-2.5 font-semibold text-foreground">{formatINR(o.total)}</td>
                   <td className="px-4 py-2.5 text-muted-foreground text-xs">
                     {new Date(o.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: '2-digit' })}
