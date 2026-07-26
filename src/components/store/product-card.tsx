@@ -139,17 +139,24 @@ export function ProductCard({ product }: { product: Product }) {
             </div>
           </div>
           {cartItem ? (
-            <Button
-              size="sm"
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                useCart.getState().setOpen(true)
-              }}
-              className="w-full h-9 px-2 transition-all text-xs sm:text-sm bg-green-600 hover:bg-green-700 text-white"
-            >
-              <Check className="h-4 w-4 mr-1 shrink-0" /> Added to Cart
-            </Button>
+            <div className="flex items-center justify-between h-9 border border-primary rounded-md bg-primary/5 w-full">
+              <button
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); useCart.getState().setQty(cartItem.id, cartItem.quantity - 1) }}
+                className="h-full px-3 sm:px-4 text-primary hover:bg-primary/10 rounded-l-md transition-colors"
+              >
+                <Minus className="h-4 w-4" />
+              </button>
+              <span className="font-bold text-sm text-foreground flex-1 text-center">
+                {cartItem.quantity} <span className="text-xs font-normal text-muted-foreground ml-0.5">in cart</span>
+              </span>
+              <button
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); useCart.getState().setQty(cartItem.id, cartItem.quantity + 1) }}
+                disabled={cartItem.quantity >= product.stock}
+                className="h-full px-3 sm:px-4 text-primary hover:bg-primary/10 rounded-r-md disabled:opacity-40 transition-colors"
+              >
+                <Plus className="h-4 w-4" />
+              </button>
+            </div>
           ) : (
             <Button
               size="sm"
