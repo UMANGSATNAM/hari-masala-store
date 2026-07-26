@@ -129,8 +129,8 @@ export function CheckoutDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="w-full sm:max-w-lg max-h-[95dvh] sm:max-h-[90vh] overflow-y-auto scrollbar-thin rounded-t-xl sm:rounded-xl">
-        <DialogHeader>
+      <DialogContent className="flex flex-col gap-0 p-0 w-[95vw] sm:w-full sm:max-w-lg max-h-[90dvh] overflow-hidden rounded-xl">
+        <DialogHeader className="px-4 py-4 sm:px-6 border-b border-border shrink-0 bg-background/95 backdrop-blur z-10 rounded-t-xl">
           <DialogTitle className="flex items-center gap-2">
             <ShoppingCart className="h-5 w-5 text-primary" />
             {done ? 'Order Placed!' : 'Checkout — Order on WhatsApp'}
@@ -142,8 +142,9 @@ export function CheckoutDialog({
           </DialogDescription>
         </DialogHeader>
 
-        {done ? (
-          <div className="flex flex-col items-center text-center py-6">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 scrollbar-thin">
+          {done ? (
+            <div className="flex flex-col items-center text-center py-6">
             <CheckCircle2 className="h-16 w-16 text-green-600 mb-3" />
             <p className="font-semibold text-lg text-foreground">Thank you for your order!</p>
             <p className="text-sm text-muted-foreground mt-1 max-w-sm">
@@ -251,11 +252,14 @@ export function CheckoutDialog({
                 <Textarea id="notes" value={form.notes} onChange={set('notes')} rows={2} placeholder="Any special instructions…" />
               </div>
             </div>
+          )}
+        </div>
 
-            <DialogFooter className="gap-2 sm:gap-2 mt-2">
-              <Button variant="outline" onClick={() => handleClose(false)} disabled={loading}>
-                Cancel
-              </Button>
+        {!done && (
+          <DialogFooter className="px-4 py-4 sm:px-6 gap-2 sm:gap-2 border-t border-border shrink-0 bg-background/95 backdrop-blur rounded-b-xl flex-col sm:flex-row">
+            <Button variant="outline" onClick={() => handleClose(false)} disabled={loading} className="w-full sm:w-auto">
+              Cancel
+            </Button>
               <Button
                 onClick={handleSubmit}
                 disabled={!valid || loading}
@@ -272,10 +276,6 @@ export function CheckoutDialog({
                 )}
               </Button>
             </DialogFooter>
-            <p className="text-[11px] text-center text-muted-foreground">
-              No online payment required. You&apos;ll pay cash when your spices arrive.
-            </p>
-          </>
         )}
       </DialogContent>
     </Dialog>

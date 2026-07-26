@@ -73,8 +73,14 @@ export function AdminOrders({ settings }: { settings: Settings }) {
   }
 
   const parseItems = (o: Order): OrderItem[] => {
-    if (Array.isArray(o.items)) return o.items
-    try { return JSON.parse(o.items as string) as OrderItem[] } catch { return [] }
+    let items: any = o.items;
+    if (typeof items === 'string') {
+      try { items = JSON.parse(items) } catch { return [] }
+    }
+    if (typeof items === 'string') {
+      try { items = JSON.parse(items) } catch { return [] }
+    }
+    return Array.isArray(items) ? items : []
   }
 
   return (
