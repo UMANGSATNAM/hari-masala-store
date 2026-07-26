@@ -55,4 +55,8 @@ server.log
 
 # SQLite databases
 *.db
-*.db-journalpublic/uploads/
+*.db-journal
+
+# Uploads
+public/uploads/*
+!public/uploads/.gitkeep

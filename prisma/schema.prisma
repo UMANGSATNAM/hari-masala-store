@@ -48,12 +48,12 @@ model Order {
   customerAddress String
   customerCity    String?
   customerPincode String?
-  items           String
+  items           String   @db.LongText
   itemCount       Int      @default(0)
   subtotal        Float
   total           Float
   status          String   @default("PENDING")
-  notes           String?
+  notes           String?  @db.Text
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
