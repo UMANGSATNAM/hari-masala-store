@@ -252,6 +252,7 @@ export function CheckoutDialog({
                 <Textarea id="notes" value={form.notes} onChange={set('notes')} rows={2} placeholder="Any special instructions…" />
               </div>
             </div>
+          </>
           )}
         </div>
 
