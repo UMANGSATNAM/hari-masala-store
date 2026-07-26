@@ -26,11 +26,11 @@ async function handleUpload(req: NextRequest) {
     }
     const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg'
     const filename = `${randomUUID()}.${ext}`
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads')
+    const uploadDir = path.join(process.cwd(), 'public')
     await mkdir(uploadDir, { recursive: true })
     const bytes = await file.arrayBuffer()
     await writeFile(path.join(uploadDir, filename), Buffer.from(bytes))
-    return NextResponse.json({ url: `/uploads/${filename}`, filename })
+    return NextResponse.json({ url: `/${filename}`, filename })
   } catch (e) {
     console.error('Upload error:', e)
     return NextResponse.json({ error: 'Upload failed' }, { status: 500 })
