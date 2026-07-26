@@ -55,4 +55,4 @@ server.log
 
 # SQLite databases
 *.db
-*.db-journal
+*.db-journalpublic/uploads/

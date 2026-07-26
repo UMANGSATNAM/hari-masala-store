@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import {
-  Plus, Pencil, Trash2, Search, Loader2, Star, StarOff, PackageX, IndianRupee, Upload,
+  Plus, Pencil, Trash2, Search, Loader2, Star, StarOff, PackageX, IndianRupee, Upload, FileDown, FileUp, Download
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -54,6 +54,7 @@ export function AdminProducts({ categories, onCategoryAdded }: { categories: Cat
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [priceEdit, setPriceEdit] = useState<{ id: string; value: string } | null>(null)
   const [uploading, setUploading] = useState(false)
+  const [importing, setImporting] = useState(false)
 
   const [quickCatOpen, setQuickCatOpen] = useState(false)
   const [quickCatName, setQuickCatName] = useState('')
@@ -104,6 +105,27 @@ export function AdminProducts({ categories, onCategoryAdded }: { categories: Cat
       toast.error(e instanceof Error ? e.message : 'Upload failed')
     } finally {
       setUploading(false)
+    }
+  }
+
+  const handleExcelImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setImporting(true)
+    try {
+      const fd = new FormData()
+      fd.append('file', file)
+      const res = await fetch('/api/products/import', { method: 'POST', body: fd })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Import failed')
+      toast.success(data.message || 'Import successful')
+      loadAll()
+    } catch (err: any) {
+      console.error(err)
+      toast.error(err.message || 'Failed to import Excel')
+    } finally {
+      setImporting(false)
+      e.target.value = ''
     }
   }
 
@@ -285,9 +307,26 @@ export function AdminProducts({ categories, onCategoryAdded }: { categories: Cat
             Manage your spice catalog — edit prices, stock & details
           </p>
         </div>
-        <Button onClick={openCreate} className="bg-primary-gradient hover:opacity-90">
-          <Plus className="h-4 w-4 mr-1.5" /> Add Product
-        </Button>
+        <div className="flex flex-wrap gap-2 items-center">
+          <Button variant="outline" size="sm" asChild>
+            <a href="/api/products/export?type=template" download>
+              <Download className="h-4 w-4 mr-1.5" /> Template
+            </a>
+          </Button>
+          <Button variant="outline" size="sm" asChild>
+            <a href="/api/products/export?type=all" download>
+              <FileDown className="h-4 w-4 mr-1.5" /> Export
+            </a>
+          </Button>
+          <label className="inline-flex items-center justify-center gap-1.5 cursor-pointer rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 h-9 px-3 text-sm font-medium border border-border">
+            {importing ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileUp className="h-4 w-4" />}
+            Import
+            <input type="file" accept=".xlsx,.xls" className="hidden" disabled={importing} onChange={handleExcelImport} />
+          </label>
+          <Button onClick={openCreate} className="bg-primary-gradient hover:opacity-90">
+            <Plus className="h-4 w-4 mr-1.5" /> Add Product
+          </Button>
+        </div>
       </div>
 
       {/* Search */}
