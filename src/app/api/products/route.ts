@@ -9,6 +9,14 @@ export const dynamic = 'force-dynamic'
 export const revalidate = 0
 export const fetchCache = 'force-no-store'
 
+import ImageKit from "imagekit";
+
+const imagekit = new ImageKit({
+  publicKey: process.env.IMAGEKIT_PUBLIC_KEY || "",
+  privateKey: process.env.IMAGEKIT_PRIVATE_KEY || "",
+  urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT || ""
+});
+
 // Handle image upload when Content-Type is multipart/form-data
 async function handleUpload(req: NextRequest) {
   try {
@@ -26,11 +34,20 @@ async function handleUpload(req: NextRequest) {
     }
     const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg'
     const filename = `${randomUUID()}.${ext}`
-    const uploadDir = path.join(process.cwd(), 'public')
-    await mkdir(uploadDir, { recursive: true })
     const bytes = await file.arrayBuffer()
-    await writeFile(path.join(uploadDir, filename), Buffer.from(bytes))
-    return NextResponse.json({ url: `/${filename}`, filename })
+    
+    // Upload to ImageKit directly instead of local filesystem
+    const uploadResult = await new Promise((resolve, reject) => {
+      imagekit.upload({
+        file: Buffer.from(bytes),
+        fileName: filename,
+      }, (err, res) => {
+        if (err) reject(err);
+        else resolve(res);
+      });
+    });
+
+    return NextResponse.json({ url: (uploadResult as any).url, filename })
   } catch (e) {
     console.error('Upload error:', e)
     return NextResponse.json({ error: 'Upload failed' }, { status: 500 })
