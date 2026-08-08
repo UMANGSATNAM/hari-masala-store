@@ -18,6 +18,7 @@ export type Product = {
   variants?: ProductVariant[]
   categories: Category[]
   image: string
+  images?: any
   stock: number
   featured: boolean
   active: boolean

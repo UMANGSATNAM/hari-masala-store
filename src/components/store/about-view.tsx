@@ -133,7 +133,7 @@ export function AboutView({ settings }: { settings: Settings }) {
               Experience the True Aroma of Pure Spices Today
             </h2>
             <p className="text-sm sm:text-base opacity-90 max-w-xl">
-              Cash on Delivery right at your doorstep.
+              Direct delivery right at your doorstep.
             </p>
             <Button
               size="lg"

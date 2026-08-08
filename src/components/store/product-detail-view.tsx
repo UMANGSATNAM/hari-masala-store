@@ -50,6 +50,7 @@ export function ProductDetailView({
   const [checkoutOpen, setCheckoutOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<'why' | 'recipes' | 'reviews'>('why')
   const [selectedVariantIdx, setSelectedVariantIdx] = useState(0)
+  const [activeImageIdx, setActiveImageIdx] = useState(0)
 
   let parsedVariants = [{ weight: product.weight, price: product.price, mrp: product.mrp }]
   if (product.variants) {
@@ -60,6 +61,17 @@ export function ProductDetailView({
     }
   }
   const selectedVariant = parsedVariants[selectedVariantIdx]
+
+  let parsedImages: string[] = []
+  if (product.images) {
+    if (typeof product.images === 'string') {
+      try { parsedImages = JSON.parse(product.images) } catch (e) {}
+    } else if (Array.isArray(product.images)) {
+      parsedImages = product.images
+    }
+  }
+  if (parsedImages.length === 0) parsedImages = [product.image]
+  const activeImage = parsedImages[activeImageIdx] || product.image
 
   const discount = discountPercent(selectedVariant.mrp, selectedVariant.price)
   const outOfStock = product.stock <= 0
@@ -108,7 +120,7 @@ export function ProductDetailView({
           <div className="md:col-span-6 lg:col-span-5 flex flex-col gap-5">
             <div className="relative aspect-square overflow-hidden rounded-2xl border border-border bg-muted/40 shadow-lg group">
               <img
-                src={product.image}
+                src={activeImage}
                 alt={product.name}
                 className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
@@ -132,6 +144,23 @@ export function ProductDetailView({
                 </div>
               )}
             </div>
+
+            {/* Thumbnail Gallery */}
+            {parsedImages.length > 1 && (
+              <div className="flex gap-3 overflow-x-auto pb-2 snap-x hide-scrollbar">
+                {parsedImages.map((src, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setActiveImageIdx(idx)}
+                    className={`relative shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-all ${
+                      activeImageIdx === idx ? 'border-primary ring-2 ring-primary/20 scale-105' : 'border-border opacity-70 hover:opacity-100'
+                    }`}
+                  >
+                    <img src={src} alt={`View ${idx + 1}`} className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
 
             {/* Guaranteed Purity Seals */}
             <div className="grid grid-cols-3 gap-2.5 sm:gap-3 p-4 rounded-xl border border-border bg-card/60 shadow-sm text-center">
@@ -328,7 +357,7 @@ export function ProductDetailView({
               </div>
               <div className="flex items-center gap-2">
                 <Check className="h-4 w-4 text-green-600 shrink-0" />
-                <span>Cash on Delivery</span>
+                <span>Secure Checkout</span>
               </div>
               <div className="flex items-center gap-2 col-span-2 sm:col-span-1">
                 <ShieldCheck className="h-4 w-4 text-amber-600 shrink-0" />

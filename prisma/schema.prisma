@@ -32,6 +32,7 @@ model Product {
   category      Category? @relation("PrimaryCategory", fields: [categoryId], references: [id], onDelete: Cascade)
   categories    Category[] @relation("ProductCategories")
   image         String
+  images        Json?
   stock         Int      @default(50)
   featured      Boolean  @default(false)
   active        Boolean  @default(true)

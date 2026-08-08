@@ -16,7 +16,7 @@ export async function PUT(
     const data: Record<string, unknown> = {}
     const fields = [
       'name', 'gujaratiName', 'description', 'price', 'mrp', 'weight',
-      'categoryIds', 'image', 'stock', 'featured', 'active', 'rating', 'variants'
+      'categoryIds', 'image', 'images', 'stock', 'featured', 'active', 'rating', 'variants'
     ]
     for (const f of fields) {
       if (body[f] !== undefined) {
@@ -24,7 +24,7 @@ export async function PUT(
           data[f] = Number(body[f])
         } else if (['featured', 'active'].includes(f)) {
           data[f] = Boolean(body[f])
-        } else if (f === 'variants') {
+        } else if (f === 'variants' || f === 'images') {
           data[f] = body[f] ? body[f] : null
         } else if (f === 'categoryIds') {
           data.categories = { set: body[f].map((id: string) => ({ id })) }

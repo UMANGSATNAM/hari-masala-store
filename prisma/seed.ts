@@ -179,7 +179,7 @@ async function main() {
       freeShipThreshold: 499,
       adminPin: '1234',
       heroImage: HERO_IMG,
-      announcement: 'Free delivery on orders above ₹499 • Order on WhatsApp • Cash on delivery',
+      announcement: 'Free delivery on orders above ₹499 • Order on WhatsApp',
     },
     create: {
       id: 'default',
@@ -189,7 +189,7 @@ async function main() {
       freeShipThreshold: 499,
       adminPin: '1234',
       heroImage: HERO_IMG,
-      announcement: 'Free delivery on orders above ₹499 • Order on WhatsApp • Cash on delivery',
+      announcement: 'Free delivery on orders above ₹499 • Order on WhatsApp',
     },
   })
 

@@ -13,7 +13,7 @@ const geistSans = Geist({
 export const metadata: Metadata = {
   title: "Hari Masala — Pure & Authentic Indian Spices",
   description:
-    "Shop premium quality Indian spices online at Hari Masala. Turmeric, chili, garam masala, cardamom, saffron and more. Order on WhatsApp with cash on delivery.",
+    "Shop premium quality Indian spices online at Hari Masala. Turmeric, chili, garam masala, cardamom, saffron and more. Order on WhatsApp.",
   keywords: [
     "Hari Masala",
     "Indian spices",
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Hari Masala — Pure & Authentic Indian Spices",
     description:
-      "Premium quality Indian spices. Order on WhatsApp. Cash on delivery available.",
+      "Premium quality Indian spices. Order on WhatsApp.",
     siteName: "Hari Masala",
     type: "website",
   },

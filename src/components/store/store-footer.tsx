@@ -89,7 +89,7 @@ export function StoreFooter({
         <div className="mt-10 pt-6 border-t border-background/15 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-background/60">
           <p>© {new Date().getFullYear()} {settings.storeName}. All rights reserved.</p>
           <div className="flex items-center gap-4">
-            <span>Cash on Delivery · WhatsApp Orders</span>
+            <span>WhatsApp Orders</span>
             <button
               onClick={onAdminClick}
               className="inline-flex items-center gap-1 hover:text-saffron transition-colors"

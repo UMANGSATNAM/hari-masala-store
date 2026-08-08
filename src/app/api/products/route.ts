@@ -113,7 +113,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     const {
       name, gujaratiName, description, price, mrp, weight, variants,
-      categoryIds, image, stock, featured, active, rating,
+      categoryIds, image, images, stock, featured, active, rating,
     } = body
 
     if (!name || !description || price == null || !categoryIds || categoryIds.length === 0 || !image) {
@@ -137,6 +137,7 @@ export async function POST(req: NextRequest) {
         categories: { connect: categoryIds.map((id: string) => ({ id })) },
         categoryId: categoryIds[0], // Maintain temporarily for migration
         image,
+        images: images ? images : undefined,
         stock: Number(stock) ?? 50,
         featured: Boolean(featured),
         active: active !== false,

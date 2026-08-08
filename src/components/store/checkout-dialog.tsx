@@ -138,7 +138,7 @@ export function CheckoutDialog({
           <DialogDescription>
             {done
               ? 'Your order has been recorded. Confirm it on WhatsApp to complete.'
-              : 'Fill in your details. Your order will be sent on WhatsApp — pay cash on delivery.'}
+              : 'Fill in your details. Your order will be sent on WhatsApp.'}
           </DialogDescription>
         </DialogHeader>
 

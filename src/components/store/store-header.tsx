@@ -175,7 +175,7 @@ export function StoreHeader({
             </Link>
           ))}
           <span className="ml-auto text-xs text-muted-foreground">
-            Order on WhatsApp · Cash on Delivery
+            Order on WhatsApp
           </span>
         </nav>
       </div>

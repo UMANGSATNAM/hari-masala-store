@@ -33,13 +33,13 @@ type FormVariant = {
 
 type FormState = {
   name: string; gujaratiName: string; description: string;
-  categoryIds: string[]; image: string; stock: string; featured: boolean
+  categoryIds: string[]; image: string; images: string[]; stock: string; featured: boolean
   active: boolean; rating: string; variants: FormVariant[]
 }
 
 const emptyForm: FormState = {
   name: '', gujaratiName: '', description: '',
-  categoryIds: [], image: '', stock: '50', featured: false, active: true, rating: '4.5',
+  categoryIds: [], image: '', images: [], stock: '50', featured: false, active: true, rating: '4.5',
   variants: [{ weight: '100g', price: '', mrp: '' }]
 }
 
@@ -98,7 +98,10 @@ export function AdminProducts({ categories, onCategoryAdded }: { categories: Cat
         throw new Error((err as { error?: string }).error || 'Upload failed')
       }
       const data = (await res.json()) as { url: string }
-      setForm((f) => ({ ...f, image: data.url }))
+      setForm((f) => {
+        const newImages = [...f.images, data.url]
+        return { ...f, image: newImages[0] || '', images: newImages }
+      })
       toast.success('Image uploaded')
     } catch (e) {
       console.error(e)
@@ -191,10 +194,20 @@ export function AdminProducts({ categories, onCategoryAdded }: { categories: Cat
       : [{ weight: p.weight, price: String(p.price), mrp: String(p.mrp) }]
 
     const categoryIds = p.categories ? p.categories.map(c => c.id) : (p.categoryId ? [p.categoryId] : [])
+    let parsedImages: string[] = []
+    if (p.images) {
+      if (typeof p.images === 'string') {
+        try { parsedImages = JSON.parse(p.images) } catch (e) {}
+      } else if (Array.isArray(p.images)) {
+        parsedImages = p.images as string[]
+      }
+    } else if (p.image) {
+      parsedImages = [p.image]
+    }
 
     setForm({
       name: p.name, gujaratiName: p.gujaratiName || '', description: p.description,
-      categoryIds, image: p.image, stock: String(p.stock),
+      categoryIds, image: p.image, images: parsedImages, stock: String(p.stock),
       featured: p.featured, active: p.active, rating: String(p.rating),
       variants: variantsList
     })
@@ -217,9 +230,9 @@ export function AdminProducts({ categories, onCategoryAdded }: { categories: Cat
 
       const payload = {
         name: form.name, gujaratiName: form.gujaratiName || null, description: form.description,
-        price: Number(rootVariant.price), mrp: Number(rootVariant.mrp) || Number(rootVariant.price),
-        weight: rootVariant.weight, categoryIds: form.categoryIds, image: form.image,
-        stock: Number(form.stock), featured: form.featured, active: form.active,
+        price: Number(rootVariant.price), mrp: Number(rootVariant.mrp),
+        weight: rootVariant.weight, categoryIds: form.categoryIds, image: form.images[0] || form.image, images: form.images,
+        stock: parseInt(form.stock) || 0, featured: form.featured, active: form.active,
         rating: Number(form.rating) || 4.5,
         variants: parsedVariants
       }
@@ -508,16 +521,44 @@ export function AdminProducts({ categories, onCategoryAdded }: { categories: Cat
           </DialogHeader>
 
           <div className="grid gap-3">
-            {form.image && (
-              <img src={form.image} alt="preview" className="h-32 w-full object-cover rounded-lg border border-border" />
+            {form.images.length > 0 && (
+              <div className="flex gap-2 overflow-x-auto pb-2">
+                {form.images.map((src, i) => (
+                  <div key={i} className="relative group shrink-0">
+                    <img src={src} alt="preview" className={`h-24 w-24 object-cover rounded-lg border ${i === 0 ? 'border-primary ring-2 ring-primary/20' : 'border-border'}`} />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newImages = form.images.filter((_, idx) => idx !== i)
+                        setForm((prev) => ({ ...prev, images: newImages, image: newImages[0] || '' }))
+                      }}
+                      className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </button>
+                    {i === 0 && <span className="absolute bottom-1 left-1 bg-primary/90 text-primary-foreground text-[10px] px-1.5 py-0.5 rounded font-medium">Main</span>}
+                  </div>
+                ))}
+              </div>
             )}
             <div className="grid gap-1.5">
-              <Label>Product Image *</Label>
+              <Label>Product Images *</Label>
               <div className="flex flex-col sm:flex-row gap-2">
                 <Input
-                  value={form.image}
-                  onChange={(e) => setForm({ ...form, image: e.target.value })}
-                  placeholder="Paste image URL or upload below…"
+                  value=""
+                  onChange={(e) => {}}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      const val = e.currentTarget.value
+                      if (val.trim()) {
+                        const newImages = [...form.images, val.trim()]
+                        setForm((prev) => ({ ...prev, images: newImages, image: newImages[0] || '' }))
+                        e.currentTarget.value = ''
+                      }
+                    }
+                  }}
+                  placeholder="Paste image URL and press Enter, or upload below…"
                   className="flex-1"
                 />
                 <label className="inline-flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap rounded-md bg-primary-gradient text-primary-foreground hover:opacity-90 h-9 px-3 text-sm font-medium">

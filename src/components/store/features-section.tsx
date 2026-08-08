@@ -26,7 +26,7 @@ const FEATURES = [
   {
     icon: Truck,
     title: 'Fast Delivery',
-    desc: 'Quick dispatch across India with cash on delivery available.',
+    desc: 'Quick dispatch across India.',
   },
   {
     icon: MessageCircle,

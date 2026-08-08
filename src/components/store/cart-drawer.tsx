@@ -155,7 +155,7 @@ export function CartDrawer({
               </Button>
             </div>
             <p className="text-[11px] text-center text-muted-foreground">
-              No online payment. Pay cash on delivery. Order sent on WhatsApp.
+              No online payment required. Order securely via WhatsApp.
             </p>
           </SheetFooter>
         )}
