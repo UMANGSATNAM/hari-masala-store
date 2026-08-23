@@ -16,15 +16,19 @@ export function ProductCard({ product }: { product: Product }) {
   const [selectedVariantIdx, setSelectedVariantIdx] = useState(0)
   const cartItems = useCart(s => s.items)
 
-  let parsedVariants = [{ weight: product.weight, price: product.price, mrp: product.mrp }]
+  let parsedVariants = [{ weight: product.weight || '100g', price: product.price || 0, mrp: product.mrp || product.price || 0 }]
   if (product.variants) {
+    let raw: any = null
     if (typeof product.variants === 'string') {
-      try { parsedVariants = JSON.parse(product.variants) } catch (e) {}
-    } else if (Array.isArray(product.variants) && product.variants.length > 0) {
-      parsedVariants = product.variants as any
+      try { raw = JSON.parse(product.variants) } catch (e) {}
+    } else if (Array.isArray(product.variants)) {
+      raw = product.variants
+    }
+    if (Array.isArray(raw) && raw.length > 0) {
+      parsedVariants = raw
     }
   }
-  const selectedVariant = parsedVariants[selectedVariantIdx]
+  const selectedVariant = parsedVariants[selectedVariantIdx] || parsedVariants[0] || { weight: product.weight || '100g', price: product.price || 0, mrp: product.mrp || product.price || 0 }
   const cartItem = cartItems.find(i => i.id === (selectedVariant ? `${product.id}-${selectedVariant.weight}` : product.id))
   const discount = discountPercent(selectedVariant.mrp, selectedVariant.price)
   const outOfStock = product.stock <= 0
@@ -45,8 +49,8 @@ export function ProductCard({ product }: { product: Product }) {
       {/* Image */}
       <Link href={`/product/${product.slug}`} className="relative aspect-square overflow-hidden bg-muted block">
         <img
-          src={product.image}
-          alt={product.name}
+          src={product.image || '/placeholder.svg'}
+          alt={product.name || 'Spice'}
           loading="lazy"
           className={`h-full w-full object-cover transition-transform duration-300 group-hover:scale-105 ${
             product.image === '/placeholder.svg' ? 'p-6 opacity-70' : ''
@@ -87,7 +91,7 @@ export function ProductCard({ product }: { product: Product }) {
           <div className="flex items-center gap-0.5 shrink-0 text-amber-500">
             <Star className="h-3.5 w-3.5 fill-current" />
             <span className="text-xs font-medium text-foreground">
-              {product.rating.toFixed(1)}
+              {(product.rating ?? 4.5).toFixed(1)}
             </span>
           </div>
         </div>

@@ -101,15 +101,19 @@ export function ProductDetailView({
     }
   }
 
-  let parsedVariants = [{ weight: product.weight, price: product.price, mrp: product.mrp }]
+  let parsedVariants = [{ weight: product.weight || '100g', price: product.price || 0, mrp: product.mrp || product.price || 0 }]
   if (product.variants) {
+    let raw: any = null
     if (typeof product.variants === 'string') {
-      try { parsedVariants = JSON.parse(product.variants) } catch (e) {}
-    } else if (Array.isArray(product.variants) && product.variants.length > 0) {
-      parsedVariants = product.variants as any
+      try { raw = JSON.parse(product.variants) } catch (e) {}
+    } else if (Array.isArray(product.variants)) {
+      raw = product.variants
+    }
+    if (Array.isArray(raw) && raw.length > 0) {
+      parsedVariants = raw
     }
   }
-  const selectedVariant = parsedVariants[selectedVariantIdx]
+  const selectedVariant = parsedVariants[selectedVariantIdx] || parsedVariants[0] || { weight: product.weight || '100g', price: product.price || 0, mrp: product.mrp || 0 }
 
   let parsedImages: string[] = []
   if (product.images) {
@@ -119,11 +123,11 @@ export function ProductDetailView({
       parsedImages = product.images
     }
   }
-  if (parsedImages.length === 0) parsedImages = [product.image]
-  const activeImage = parsedImages[activeImageIdx] || product.image
+  if (!Array.isArray(parsedImages) || parsedImages.length === 0) parsedImages = [product.image || '/placeholder.svg']
+  const activeImage = parsedImages[activeImageIdx] || product.image || '/placeholder.svg'
 
   const discount = discountPercent(selectedVariant.mrp, selectedVariant.price)
-  const outOfStock = product.stock <= 0
+  const outOfStock = (product.stock ?? 50) <= 0
 
   const handleAddToCart = () => {
     if (outOfStock) return
@@ -256,7 +260,7 @@ export function ProductDetailView({
               <div className="flex items-center gap-1 text-amber-500 bg-amber-500/10 px-3 py-1 rounded-full">
                 <Star className="h-4 w-4 fill-current" />
                 <span className="text-xs sm:text-sm font-bold text-foreground">
-                  {product.rating.toFixed(1)}
+                  {(product.rating ?? 4.5).toFixed(1)}
                 </span>
                 <span className="text-xs text-muted-foreground ml-1">(142+ Verified Reviews)</span>
               </div>
