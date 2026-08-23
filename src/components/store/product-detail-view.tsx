@@ -56,6 +56,13 @@ export function ProductDetailView({
   const [selectedVariantIdx, setSelectedVariantIdx] = useState(0)
   const [activeImageIdx, setActiveImageIdx] = useState(0)
   const [copiedLink, setCopiedLink] = useState(false)
+  const [canNativeShare, setCanNativeShare] = useState(false)
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
+      setCanNativeShare(true)
+    }
+  }, [])
 
   const getShareUrl = () => {
     if (typeof window !== 'undefined') return window.location.href
@@ -427,7 +434,7 @@ export function ProductDetailView({
                       </>
                     )}
                   </Button>
-                  {typeof navigator !== 'undefined' && typeof navigator.share === 'function' && (
+                  {canNativeShare && (
                     <Button
                       size="sm"
                       variant="ghost"

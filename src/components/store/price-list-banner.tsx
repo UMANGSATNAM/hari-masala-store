@@ -5,10 +5,12 @@ import { Button } from '@/components/ui/button'
 import type { Settings } from '@/lib/types'
 import { toast } from 'sonner'
 
-export function PriceListBanner({ settings }: { settings: Settings }) {
-  const pdfUrl = settings.priceListPdf || '/Hari_Masala_Price_List.pdf'
+export function PriceListBanner({ settings }: { settings?: Settings | null }) {
+  const pdfUrl = settings?.priceListPdf || '/Hari_Masala_Price_List.pdf'
 
-  const handleDownload = () => {
+  const handleDownload = (e?: React.MouseEvent) => {
+    e?.stopPropagation()
+    if (typeof window === 'undefined' || typeof document === 'undefined') return
     toast.success('Downloading Hari Masala Price List PDF...')
     const link = document.createElement('a')
     link.href = pdfUrl
