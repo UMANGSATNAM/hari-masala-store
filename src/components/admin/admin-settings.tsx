@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Save, Loader2, Store, MessageCircle, Image as ImageIcon, Lock, Megaphone, Plus, Trash2, Upload } from 'lucide-react'
+import { Save, Loader2, Store, MessageCircle, Image as ImageIcon, Lock, Megaphone, Plus, Trash2, Upload, FileText } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -37,6 +37,7 @@ export function AdminSettings({
     freeShipThreshold: String(settings.freeShipThreshold),
     announcement: settings.announcement || '',
     logoImage: settings.logoImage || '',
+    priceListPdf: settings.priceListPdf || '',
     adminPin: '',
   })
   
@@ -51,6 +52,7 @@ export function AdminSettings({
       freeShipThreshold: String(settings.freeShipThreshold),
       announcement: settings.announcement || '',
       logoImage: settings.logoImage || '',
+      priceListPdf: settings.priceListPdf || '',
       adminPin: '',
     })
     setHeroImages(parseHeroImages(settings.heroImage))
@@ -66,6 +68,7 @@ export function AdminSettings({
         freeShipThreshold: Number(form.freeShipThreshold),
         announcement: form.announcement || null,
         logoImage: form.logoImage || null,
+        priceListPdf: form.priceListPdf || null,
         heroImage: heroImages.length > 0 ? JSON.stringify(heroImages) : null,
       }
       if (form.adminPin) payload.adminPin = form.adminPin
@@ -77,6 +80,30 @@ export function AdminSettings({
       toast.error('Failed to save settings')
     } finally {
       setSaving(false)
+    }
+  }
+
+  const handlePdfUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (file.type !== 'application/pdf') {
+      toast.error('Only PDF files are allowed')
+      return
+    }
+    setUploading(true)
+    try {
+      const fd = new FormData()
+      fd.append('file', file)
+      const res = await fetch('/api/products', { method: 'POST', body: fd })
+      if (!res.ok) throw new Error('Upload failed')
+      const data = await res.json()
+      setForm((prev) => ({ ...prev, priceListPdf: data.url }))
+      toast.success('Price List PDF uploaded & updated!')
+    } catch (err) {
+      toast.error('Failed to upload Price List PDF')
+    } finally {
+      setUploading(false)
+      e.target.value = ''
     }
   }
 
@@ -249,6 +276,66 @@ export function AdminSettings({
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Price List PDF Management */}
+      <Card className="shadow-sm border-amber-500/30">
+        <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
+          <CardTitle className="text-base flex items-center gap-2 text-amber-700 dark:text-amber-400">
+            <FileText className="h-4 w-4 text-amber-600" /> Price List PDF Management
+          </CardTitle>
+          <div className="relative">
+            <Button size="sm" variant="outline" className="border-amber-500/40 text-amber-800 dark:text-amber-300 hover:bg-amber-50" disabled={uploading}>
+              {uploading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Upload className="h-4 w-4 mr-2" />}
+              Upload / Replace PDF
+            </Button>
+            <input
+              type="file"
+              accept="application/pdf"
+              onChange={handlePdfUpload}
+              className="absolute inset-0 opacity-0 cursor-pointer"
+              disabled={uploading}
+            />
+          </div>
+        </CardHeader>
+        <CardContent className="grid gap-3">
+          <p className="text-xs text-muted-foreground">
+            Upload or update your store price list PDF. Website visitors clicking "Download Our Price List" will automatically download this file.
+          </p>
+
+          <div className="grid gap-1.5">
+            <Label className="text-xs">Direct PDF URL</Label>
+            <Input
+              value={form.priceListPdf}
+              onChange={(e) => setForm({ ...form, priceListPdf: e.target.value })}
+              placeholder="e.g. /Hari_Masala_Price_List.pdf or ImageKit URL"
+              className="text-xs font-mono"
+            />
+          </div>
+
+          {form.priceListPdf ? (
+            <div className="flex items-center justify-between p-3 rounded-lg border border-amber-200 dark:border-amber-900/50 bg-amber-50/50 dark:bg-amber-950/20 text-xs">
+              <div className="flex items-center gap-2 truncate">
+                <FileText className="h-4 w-4 text-amber-600 shrink-0" />
+                <span className="font-semibold text-foreground truncate">{form.priceListPdf}</span>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <Button size="sm" variant="outline" asChild className="h-7 text-xs">
+                  <a href={form.priceListPdf} target="_blank" rel="noreferrer">
+                    Preview PDF
+                  </a>
+                </Button>
+                <Button size="sm" variant="ghost" className="h-7 w-7 text-destructive" onClick={() => setForm({ ...form, priceListPdf: '' })}>
+                  <Trash2 className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="p-3 rounded-lg border border-dashed border-border text-center text-xs text-muted-foreground">
+              Using default PDF (<code className="font-mono text-[11px]">/Hari_Masala_Price_List.pdf</code>). Upload a new file above to replace it.
             </div>
           )}
         </CardContent>

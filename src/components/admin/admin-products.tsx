@@ -2,7 +2,8 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import {
-  Plus, Pencil, Trash2, Search, Loader2, Star, StarOff, PackageX, IndianRupee, Upload, FileDown, FileUp, Download
+  Plus, Pencil, Trash2, Search, Loader2, Star, StarOff, PackageX, IndianRupee, Upload, FileDown, FileUp, Download,
+  ArrowUp, ArrowDown, ChevronsUp, ChevronsDown, Hash, ListOrdered, ArrowUpDown
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -55,6 +56,43 @@ export function AdminProducts({ categories, onCategoryAdded }: { categories: Cat
   const [priceEdit, setPriceEdit] = useState<{ id: string; value: string } | null>(null)
   const [uploading, setUploading] = useState(false)
   const [importing, setImporting] = useState(false)
+
+  const [posModal, setPosModal] = useState<{ open: boolean; product: Product | null; positionStr: string }>({
+    open: false, product: null, positionStr: ''
+  })
+  const [reordering, setReordering] = useState(false)
+
+  const handleReorder = async (
+    id: string,
+    action: 'move_to_top' | 'move_to_last' | 'move_up' | 'move_down' | 'move_to_position',
+    targetPos?: number
+  ) => {
+    setReordering(true)
+    try {
+      const res = await api.reorderProducts({ id, action, targetPosition: targetPos })
+      if (res.products) {
+        setProducts(res.products)
+      } else {
+        await loadAll()
+      }
+      toast.success('Product order updated!')
+    } catch {
+      toast.error('Failed to reorder product')
+    } finally {
+      setReordering(false)
+    }
+  }
+
+  const applyCustomPosition = () => {
+    if (!posModal.product) return
+    const pos = parseInt(posModal.positionStr)
+    if (isNaN(pos) || pos < 1) {
+      toast.error('Please enter a valid position number (1 or greater)')
+      return
+    }
+    handleReorder(posModal.product.id, 'move_to_position', pos)
+    setPosModal({ open: false, product: null, positionStr: '' })
+  }
 
   const [quickCatOpen, setQuickCatOpen] = useState(false)
   const [quickCatName, setQuickCatName] = useState('')
@@ -358,6 +396,7 @@ export function AdminProducts({ categories, onCategoryAdded }: { categories: Cat
         <table className="w-full text-sm">
           <thead className="bg-muted/50 text-muted-foreground">
             <tr>
+              <th className="text-center font-semibold px-3 py-3 w-16">Pos</th>
               <th className="text-left font-semibold px-4 py-3">Product</th>
               <th className="text-left font-semibold px-4 py-3">Category</th>
               <th className="text-left font-semibold px-4 py-3">Price (₹)</th>
@@ -365,6 +404,7 @@ export function AdminProducts({ categories, onCategoryAdded }: { categories: Cat
               <th className="text-left font-semibold px-4 py-3">Stock</th>
               <th className="text-center font-semibold px-4 py-3">Featured</th>
               <th className="text-center font-semibold px-4 py-3">Active</th>
+              <th className="text-center font-semibold px-3 py-3">Order / Priority</th>
               <th className="text-right font-semibold px-4 py-3">Actions</th>
             </tr>
           </thead>
@@ -372,22 +412,32 @@ export function AdminProducts({ categories, onCategoryAdded }: { categories: Cat
             {loading ? (
               Array.from({ length: 6 }).map((_, i) => (
                 <tr key={i}>
-                  <td colSpan={8} className="px-4 py-3"><Skeleton className="h-10 w-full" /></td>
+                  <td colSpan={10} className="px-4 py-3"><Skeleton className="h-10 w-full" /></td>
                 </tr>
               ))
             ) : filtered.length === 0 ? (
               <tr>
-                <td colSpan={8} className="px-4 py-10 text-center text-muted-foreground">
+                <td colSpan={10} className="px-4 py-10 text-center text-muted-foreground">
                   <PackageX className="h-8 w-8 mx-auto mb-2 opacity-50" />
                   No products found
                 </td>
               </tr>
             ) : (
-              filtered.map((p) => (
+              filtered.map((p, idx) => (
                 <tr key={p.id} className="hover:bg-accent/30">
+                  <td className="px-3 py-2.5 text-center">
+                    <span className={`inline-flex items-center justify-center h-6 min-w-6 px-1.5 rounded-md text-xs font-mono font-bold ${
+                      idx === 0 
+                        ? 'bg-amber-500 text-white shadow-xs' 
+                        : idx === 1 
+                        ? 'bg-slate-200 dark:bg-slate-800 text-foreground font-semibold'
+                        : 'bg-muted text-muted-foreground'
+                    }`}>
+                      #{p.position || idx + 1}
+                    </span>
+                  </td>
                   <td className="px-4 py-2.5">
                     <div className="flex items-center gap-2.5">
-                      { }
                       <img src={p.image} alt={p.name} className="h-10 w-10 rounded-md object-cover border border-border" />
                       <div className="min-w-0">
                         <p className="font-medium text-foreground truncate max-w-[180px]" lang="gu">{p.gujaratiName || p.name}</p>
@@ -435,6 +485,61 @@ export function AdminProducts({ categories, onCategoryAdded }: { categories: Cat
                   <td className="px-4 py-2.5 text-center">
                     <Switch checked={p.active} onCheckedChange={() => toggleActive(p)} />
                   </td>
+                  {/* Order / Priority Buttons */}
+                  <td className="px-3 py-2.5 text-center">
+                    <div className="inline-flex items-center gap-0.5 border border-border rounded-lg p-0.5 bg-card shadow-xs">
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-7 w-7 text-xs hover:bg-amber-50 dark:hover:bg-amber-950/40 text-amber-600"
+                        title="Move to 1st Position (Top)"
+                        disabled={reordering || idx === 0}
+                        onClick={() => handleReorder(p.id, 'move_to_top')}
+                      >
+                        <ChevronsUp className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-7 w-7 text-xs"
+                        title="Move Up 1 position"
+                        disabled={reordering || idx === 0}
+                        onClick={() => handleReorder(p.id, 'move_up')}
+                      >
+                        <ArrowUp className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-7 w-7 text-xs"
+                        title="Move Down 1 position"
+                        disabled={reordering || idx === filtered.length - 1}
+                        onClick={() => handleReorder(p.id, 'move_down')}
+                      >
+                        <ArrowDown className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-7 w-7 text-xs text-primary"
+                        title="Set Specific Position Number"
+                        disabled={reordering}
+                        onClick={() => setPosModal({ open: true, product: p, positionStr: String(p.position || idx + 1) })}
+                      >
+                        <Hash className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-7 w-7 text-xs text-muted-foreground"
+                        title="Move to Last Position"
+                        disabled={reordering || idx === filtered.length - 1}
+                        onClick={() => handleReorder(p.id, 'move_to_last')}
+                      >
+                        <ChevronsDown className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  </td>
                   <td className="px-4 py-2.5">
                     <div className="flex justify-end gap-1">
                       <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => openEdit(p)}>
@@ -461,15 +566,19 @@ export function AdminProducts({ categories, onCategoryAdded }: { categories: Cat
             <PackageX className="h-8 w-8 mx-auto mb-2 opacity-50" /> No products found
           </div>
         ) : (
-          filtered.map((p) => (
-            <div key={p.id} className="rounded-xl border border-border p-3 bg-card">
+          filtered.map((p, idx) => (
+            <div key={p.id} className="rounded-xl border border-border p-3.5 bg-card space-y-3">
               <div className="flex gap-3">
-                { }
                 <img src={p.image} alt={p.name} className="h-14 w-14 rounded-md object-cover border border-border" />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <p className="font-medium text-sm text-foreground truncate" lang="gu">{p.gujaratiName || p.name}</p>
+                      <div className="flex items-center gap-1.5">
+                        <span className="bg-amber-500/20 text-amber-800 dark:text-amber-300 text-[10px] font-mono font-bold px-1.5 py-0.5 rounded">
+                          #{p.position || idx + 1}
+                        </span>
+                        <p className="font-medium text-sm text-foreground truncate" lang="gu">{p.gujaratiName || p.name}</p>
+                      </div>
                       <p className="text-xs text-muted-foreground truncate">{p.name} · {p.weight}</p>
                     </div>
                     {p.featured && <Badge className="bg-saffron-gradient text-secondary-foreground text-[10px]">★</Badge>}
@@ -490,9 +599,6 @@ export function AdminProducts({ categories, onCategoryAdded }: { categories: Cat
                         </button>
                       )}
                       <span className="text-xs text-muted-foreground line-through">{formatINR(p.mrp)}</span>
-                      <span className={`text-xs ${p.stock < 15 ? 'text-red-600 font-semibold' : 'text-muted-foreground'}`}>
-                        · {p.stock} in stock
-                      </span>
                     </div>
                     <div className="flex gap-1">
                       <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => openEdit(p)}>
@@ -503,6 +609,49 @@ export function AdminProducts({ categories, onCategoryAdded }: { categories: Cat
                       </Button>
                     </div>
                   </div>
+                </div>
+              </div>
+
+              {/* Mobile Reorder Toolbar */}
+              <div className="pt-2 border-t border-border flex items-center justify-between gap-2 text-xs">
+                <span className="text-muted-foreground text-[11px] font-medium">Order Position:</span>
+                <div className="flex items-center gap-1">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-7 px-2 text-[11px]"
+                    disabled={reordering || idx === 0}
+                    onClick={() => handleReorder(p.id, 'move_to_top')}
+                  >
+                    <ChevronsUp className="h-3 w-3 mr-0.5 text-amber-600" /> #1 Top
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-7 px-1.5 text-[11px]"
+                    disabled={reordering || idx === 0}
+                    onClick={() => handleReorder(p.id, 'move_up')}
+                  >
+                    <ArrowUp className="h-3 w-3" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-7 px-1.5 text-[11px]"
+                    disabled={reordering || idx === filtered.length - 1}
+                    onClick={() => handleReorder(p.id, 'move_down')}
+                  >
+                    <ArrowDown className="h-3 w-3" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-7 px-2 text-[11px] text-primary"
+                    disabled={reordering}
+                    onClick={() => setPosModal({ open: true, product: p, positionStr: String(p.position || idx + 1) })}
+                  >
+                    <Hash className="h-3 w-3 mr-0.5" /> Pos
+                  </Button>
                 </div>
               </div>
             </div>
@@ -811,6 +960,61 @@ export function AdminProducts({ categories, onCategoryAdded }: { categories: Cat
             <Button size="sm" onClick={handleQuickCreateCategory} disabled={quickCatSaving} className="bg-primary-gradient hover:opacity-90">
               {quickCatSaving ? <Loader2 className="h-4 w-4 mr-1.5 animate-spin" /> : null}
               Create & Select
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Set Product Position Modal */}
+      <Dialog open={posModal.open} onOpenChange={(v) => !v && setPosModal({ open: false, product: null, positionStr: '' })}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Hash className="h-5 w-5 text-primary" /> Set Specific Position
+            </DialogTitle>
+            <DialogDescription>
+              Move &quot;{posModal.product?.name}&quot; to any position in your catalog.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-3 py-2">
+            <div className="grid gap-1.5">
+              <Label>Position Number (1 = Top / 1st)</Label>
+              <Input
+                type="number"
+                min={1}
+                max={products.length}
+                value={posModal.positionStr}
+                onChange={(e) => setPosModal({ ...posModal, positionStr: e.target.value })}
+                placeholder="e.g. 1 for top, 2 for second..."
+                autoFocus
+                onKeyDown={(e) => { if (e.key === 'Enter') applyCustomPosition() }}
+              />
+              <p className="text-xs text-muted-foreground">
+                Currently at position #{products.findIndex((p) => p.id === posModal.product?.id) + 1} of {products.length}.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => setPosModal({ ...posModal, positionStr: '1' })}>
+                #1 (Top)
+              </Button>
+              <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => setPosModal({ ...posModal, positionStr: '2' })}>
+                #2
+              </Button>
+              <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => setPosModal({ ...posModal, positionStr: '3' })}>
+                #3
+              </Button>
+              <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => setPosModal({ ...posModal, positionStr: String(products.length) })}>
+                #{products.length} (Last)
+              </Button>
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" size="sm" onClick={() => setPosModal({ open: false, product: null, positionStr: '' })}>
+              Cancel
+            </Button>
+            <Button size="sm" onClick={applyCustomPosition} disabled={reordering} className="bg-primary-gradient hover:opacity-90">
+              {reordering ? <Loader2 className="h-4 w-4 mr-1.5 animate-spin" /> : null}
+              Update Position
             </Button>
           </DialogFooter>
         </DialogContent>

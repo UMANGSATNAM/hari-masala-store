@@ -16,11 +16,11 @@ export async function PUT(
     const data: Record<string, unknown> = {}
     const fields = [
       'name', 'gujaratiName', 'description', 'price', 'mrp', 'weight',
-      'categoryIds', 'image', 'images', 'stock', 'featured', 'active', 'rating', 'variants'
+      'categoryIds', 'image', 'images', 'stock', 'featured', 'active', 'rating', 'variants', 'position'
     ]
     for (const f of fields) {
       if (body[f] !== undefined) {
-        if (['price', 'mrp', 'stock', 'rating'].includes(f)) {
+        if (['price', 'mrp', 'stock', 'rating', 'position'].includes(f)) {
           data[f] = Number(body[f])
         } else if (['featured', 'active'].includes(f)) {
           data[f] = Boolean(body[f])

@@ -17,7 +17,11 @@ import {
   HeartHandshake,
   ChevronDown,
   Zap,
-  Utensils
+  Utensils,
+  Copy,
+  CheckCheck,
+  ShieldAlert,
+  RotateCcw
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -51,6 +55,44 @@ export function ProductDetailView({
   const [activeTab, setActiveTab] = useState<'why' | 'recipes' | 'reviews'>('why')
   const [selectedVariantIdx, setSelectedVariantIdx] = useState(0)
   const [activeImageIdx, setActiveImageIdx] = useState(0)
+  const [copiedLink, setCopiedLink] = useState(false)
+
+  const getShareUrl = () => {
+    if (typeof window !== 'undefined') return window.location.href
+    return `https://harimasala.com/product/${product.slug}`
+  }
+
+  const handleShareWhatsApp = () => {
+    const shareUrl = getShareUrl()
+    const label = product.gujaratiName ? `${product.gujaratiName} (${product.name})` : product.name
+    const text = encodeURIComponent(`*Hari Masala* - Check out ${label}:\n${shareUrl}`)
+    window.open(`https://wa.me/?text=${text}`, '_blank')
+  }
+
+  const handleCopyUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(getShareUrl())
+      setCopiedLink(true)
+      toast.success('✓ Product link copied to clipboard!')
+      setTimeout(() => setCopiedLink(false), 2500)
+    } catch (e) {
+      toast.error('Failed to copy product link')
+    }
+  }
+
+  const handleNativeShare = async () => {
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({
+          title: product.name,
+          text: `Buy authentic ${product.name} from Hari Masala`,
+          url: getShareUrl(),
+        })
+      } catch (e) {}
+    } else {
+      handleCopyUrl()
+    }
+  }
 
   let parsedVariants = [{ weight: product.weight, price: product.price, mrp: product.mrp }]
   if (product.variants) {
@@ -348,6 +390,75 @@ export function ProductDetailView({
               <MessageCircle className="h-4 w-4 mr-2 text-green-600 fill-current" />
               Prefer ordering on WhatsApp? Click here to chat
             </Button>
+
+            {/* Share Product & Return Policy */}
+            <div className="mt-5 space-y-3">
+              {/* Product Share Options */}
+              <div className="p-3.5 rounded-xl border border-border bg-card/80 flex flex-wrap items-center justify-between gap-3 shadow-xs">
+                <div className="flex items-center gap-2">
+                  <Share2 className="h-4 w-4 text-primary shrink-0" />
+                  <span className="text-xs font-bold text-foreground">Share Product:</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleShareWhatsApp}
+                    className="h-8 text-xs border-green-600/40 text-green-700 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-950/40 font-semibold"
+                  >
+                    <MessageCircle className="h-3.5 w-3.5 mr-1.5 text-green-600 fill-current" />
+                    WhatsApp
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleCopyUrl}
+                    className="h-8 text-xs font-semibold"
+                  >
+                    {copiedLink ? (
+                      <>
+                        <CheckCheck className="h-3.5 w-3.5 mr-1.5 text-green-600" />
+                        Copied Link
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="h-3.5 w-3.5 mr-1.5" />
+                        Copy Link
+                      </>
+                    )}
+                  </Button>
+                  {typeof navigator !== 'undefined' && typeof navigator.share === 'function' && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={handleNativeShare}
+                      className="h-8 px-2 text-xs"
+                      title="More Share Options"
+                    >
+                      <Share2 className="h-3.5 w-3.5" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+
+              {/* No Return & No Exchange Policy Notice */}
+              <div className="p-3.5 rounded-xl border border-amber-500/30 bg-amber-50/60 dark:bg-amber-950/20 text-amber-900 dark:text-amber-200 flex items-start gap-3">
+                <ShieldAlert className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                <div className="text-xs space-y-0.5">
+                  <div className="flex items-center gap-2">
+                    <span className="font-extrabold text-foreground uppercase tracking-wide">
+                      Return & Exchange Policy:
+                    </span>
+                    <span className="font-black text-amber-800 dark:text-amber-300 bg-amber-200/80 dark:bg-amber-900/60 px-2 py-0.5 rounded text-[11px]">
+                      No Return · No Exchange
+                    </span>
+                  </div>
+                  <p className="text-muted-foreground leading-relaxed">
+                    Due to food safety and hygiene standards, spices and food items are non-returnable and non-exchangeable once delivered.
+                  </p>
+                </div>
+              </div>
+            </div>
 
             {/* Assurance Bar */}
             <div className="mt-6 pt-5 border-t border-border grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs text-muted-foreground">

@@ -25,9 +25,9 @@ async function handleUpload(req: NextRequest) {
     if (!file) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })
     }
-    const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/jpg', 'video/mp4', 'video/webm']
+    const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/jpg', 'video/mp4', 'video/webm', 'application/pdf']
     if (!allowed.includes(file.type)) {
-      return NextResponse.json({ error: 'Only JPG, PNG, WEBP, GIF, MP4, WEBM allowed' }, { status: 400 })
+      return NextResponse.json({ error: 'Only JPG, PNG, WEBP, GIF, MP4, WEBM, PDF allowed' }, { status: 400 })
     }
     if (file.size > 25 * 1024 * 1024) {
       return NextResponse.json({ error: 'File too large (max 25MB)' }, { status: 400 })
@@ -94,7 +94,7 @@ export async function GET(req: NextRequest) {
     const products = await db.product.findMany({
       where,
       include: { categories: true, category: true },
-      orderBy: [{ featured: 'desc' }, { createdAt: 'desc' }],
+      orderBy: [{ position: 'asc' }, { featured: 'desc' }, { createdAt: 'desc' }],
     })
     return NextResponse.json({ products })
   } catch (e: any) {

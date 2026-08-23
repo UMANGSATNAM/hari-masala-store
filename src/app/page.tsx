@@ -34,6 +34,7 @@ export default function Home() {
           heroImage: null,
           announcement: null,
           logoImage: null,
+          priceListPdf: null,
         })
         setCategories(c?.categories || [])
         setProducts(p?.products || [])
@@ -50,6 +51,7 @@ export default function Home() {
           heroImage: null,
           announcement: null,
           logoImage: null,
+          priceListPdf: null,
         })
       })
       .finally(() => setLoading(false))

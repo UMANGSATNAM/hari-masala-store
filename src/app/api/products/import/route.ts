@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
 
       // Parse Categories
       const categoryNames = String(row.Categories || '').split(',').map(c => c.trim()).filter(Boolean)
-      const categoryIds = []
+      const categoryIds: string[] = []
 
       for (const catName of categoryNames) {
         const catSlug = catName.toLowerCase().replace(/[^a-z0-9]+/g, '-')

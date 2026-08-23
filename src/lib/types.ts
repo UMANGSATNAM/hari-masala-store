@@ -16,6 +16,8 @@ export type Product = {
   mrp: number
   weight: string
   variants?: ProductVariant[]
+  categoryId?: string | null
+  category?: Category | null
   categories: Category[]
   image: string
   images?: any
@@ -23,6 +25,7 @@ export type Product = {
   featured: boolean
   active: boolean
   rating: number
+  position?: number
   createdAt: string
   updatedAt: string
 }
@@ -83,6 +86,7 @@ export type Settings = {
   heroImage: string | null
   announcement: string | null
   logoImage: string | null
+  priceListPdf: string | null
 }
 
 export const ORDER_STATUSES = ['PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCELLED'] as const

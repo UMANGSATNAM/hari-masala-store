@@ -36,6 +36,8 @@ export const api = {
     jfetch<{ product: Product }>(`/api/products/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   deleteProduct: (id: string) =>
     jfetch<{ ok: boolean }>(`/api/products/${id}`, { method: 'DELETE' }),
+  reorderProducts: (data: { action: 'move_to_top' | 'move_to_last' | 'move_up' | 'move_down' | 'move_to_position' | 'set_positions'; id?: string; targetPosition?: number; positions?: { id: string; position: number }[] }) =>
+    jfetch<{ ok: boolean; products?: Product[] }>(`/api/products/reorder`, { method: 'POST', body: JSON.stringify(data) }),
 
   getCategories: () => jfetch<{ categories: (Category & { _count?: { products: number } })[] }>(`/api/categories`),
   createCategory: (data: { name: string; icon?: string; sortOrder?: number }) =>

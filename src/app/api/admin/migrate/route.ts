@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    let logs = []
+    let logs: string[] = []
     logs.push('Starting database setup and data migration...')
     
     // 1. Create the _ProductCategories table

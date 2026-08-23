@@ -1,6 +1,6 @@
 'use client'
 
-import { ShieldCheck, Leaf, Truck, MessageCircle, Award, Sparkles } from 'lucide-react'
+import { ShieldCheck, Leaf, Truck, MessageCircle, Award, Sparkles, ShieldAlert } from 'lucide-react'
 
 const FEATURES = [
   {
@@ -24,14 +24,14 @@ const FEATURES = [
     desc: 'Sealed in food-grade packaging to keep freshness intact.',
   },
   {
-    icon: Truck,
-    title: 'Fast Delivery',
-    desc: 'Quick dispatch across India.',
+    icon: ShieldAlert,
+    title: 'No Return / No Exchange',
+    desc: 'Strict food safety standards: items are non-returnable once opened or delivered.',
   },
   {
     icon: MessageCircle,
     title: 'Easy WhatsApp Ordering',
-    desc: 'No app or payment gateway needed — just order on WhatsApp.',
+    desc: 'No app or payment gateway needed — just order directly on WhatsApp.',
   },
 ]
 
