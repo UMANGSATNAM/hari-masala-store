@@ -1,73 +1,101 @@
-'use client'
+import type { Metadata } from 'next'
+import { db } from '@/lib/db'
+import { ProductClient } from './product-client'
 
-import { useEffect, useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
-import { ProductDetailView } from '@/components/store/product-detail-view'
-import { api } from '@/lib/api-client'
-import type { Product, Settings } from '@/lib/types'
+export const dynamic = 'force-dynamic'
 
-export default function ProductDetailPage() {
-  const params = useParams()
-  const router = useRouter()
-  const slug = typeof params?.slug === 'string' ? params.slug : ''
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}): Promise<Metadata> {
+  const { slug } = await params
+  if (!slug) return { title: 'Hari Masala' }
 
-  const [product, setProduct] = useState<Product | null>(null)
-  const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
-  const [settings, setSettings] = useState<Settings | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(false)
-
-  useEffect(() => {
-    if (!slug) return
-    setLoading(true)
-    Promise.all([api.getProductBySlug(slug), api.getSettings()])
-      .then(([res, s]) => {
-        setProduct(res.product)
-        setRelatedProducts(res.relatedProducts || [])
-        setSettings(s.settings)
+  let product: any = null
+  try {
+    product = await db.product.findUnique({
+      where: { slug },
+    })
+    if (!product) {
+      product = await db.product.findFirst({
+        where: {
+          OR: [
+            { id: slug },
+            { slug: { equals: slug } },
+            { name: { equals: slug.replace(/-/g, ' ') } },
+          ],
+        },
       })
-      .catch((e) => {
-        console.error('Product detail load error:', e)
-        setError(true)
-      })
-      .finally(() => setLoading(false))
-  }, [slug])
-
-  if (loading || !settings) {
-    return (
-      <div className="min-h-screen grid place-items-center bg-background">
-        <div className="flex flex-col items-center gap-3">
-          <div className="h-10 w-10 rounded-full border-4 border-primary border-t-transparent animate-spin" />
-          <p className="text-sm text-muted-foreground">Loading authentic spice details…</p>
-        </div>
-      </div>
-    )
+    }
+  } catch (e) {
+    console.error('Metadata product query error:', e)
   }
 
-  if (error || !product) {
-    return (
-      <div className="min-h-screen grid place-items-center bg-background p-4 text-center">
-        <div className="max-w-md space-y-4">
-          <h1 className="text-2xl font-bold text-foreground">Spice Not Found</h1>
-          <p className="text-sm text-muted-foreground">
-            The spice you are looking for might have been moved or discontinued.
-          </p>
-          <button
-            onClick={() => router.push('/')}
-            className="inline-flex items-center px-5 py-2.5 rounded-lg bg-primary-gradient text-primary-foreground font-semibold text-sm shadow hover:opacity-90 transition"
-          >
-            Explore All Spices
-          </button>
-        </div>
-      </div>
-    )
+  if (!product) {
+    return {
+      title: 'Spice Not Found | Hari Masala',
+      description: 'Authentic Indian Spices from Hari Masala',
+    }
   }
 
-  return (
-    <ProductDetailView
-      product={product}
-      relatedProducts={relatedProducts}
-      settings={settings}
-    />
-  )
+  const label = product.gujaratiName
+    ? `${product.gujaratiName} (${product.name})`
+    : product.name
+
+  const title = `${label} - Pure & Authentic Spices | Hari Masala`
+  const description =
+    product.description ||
+    `Buy authentic ${product.name} online from Hari Masala. Pure quality, rich aroma, and traditional taste delivered to your doorstep.`
+
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://harimasala.com'
+  let imageUrl = product.image || '/placeholder.svg'
+  if (!imageUrl.startsWith('http')) {
+    imageUrl = `${baseUrl}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`
+  }
+
+  const productUrl = `${baseUrl}/product/${product.slug}`
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: productUrl,
+      siteName: 'Hari Masala',
+      images: [
+        {
+          url: imageUrl,
+          width: 800,
+          height: 800,
+          alt: product.name,
+        },
+      ],
+      type: 'website',
+      locale: 'en_IN',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [imageUrl],
+    },
+  }
+}
+
+export default async function ProductDetailPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}) {
+  const { slug } = await params
+  let initialProduct: any = null
+  try {
+    initialProduct = await db.product.findUnique({
+      where: { slug },
+    })
+  } catch (e) {}
+
+  return <ProductClient initialProduct={initialProduct} />
 }

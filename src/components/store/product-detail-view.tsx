@@ -33,6 +33,7 @@ import { WhatsAppFloatingButton } from './whatsapp-floating-button'
 import { ProductCard } from './product-card'
 import { useCart } from '@/lib/store'
 import { formatINR, discountPercent } from '@/lib/format'
+import { shareProductWithImage, copyProductLink } from '@/lib/share'
 import type { Product, Settings } from '@/lib/types'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
@@ -69,38 +70,6 @@ export function ProductDetailView({
     return `https://harimasala.com/product/${product.slug}`
   }
 
-  const handleShareWhatsApp = () => {
-    const shareUrl = getShareUrl()
-    const label = product.gujaratiName ? `${product.gujaratiName} (${product.name})` : product.name
-    const text = encodeURIComponent(`*Hari Masala* - Check out ${label}:\n${shareUrl}`)
-    window.open(`https://wa.me/?text=${text}`, '_blank')
-  }
-
-  const handleCopyUrl = async () => {
-    try {
-      await navigator.clipboard.writeText(getShareUrl())
-      setCopiedLink(true)
-      toast.success('✓ Product link copied to clipboard!')
-      setTimeout(() => setCopiedLink(false), 2500)
-    } catch (e) {
-      toast.error('Failed to copy product link')
-    }
-  }
-
-  const handleNativeShare = async () => {
-    if (typeof navigator !== 'undefined' && navigator.share) {
-      try {
-        await navigator.share({
-          title: product.name,
-          text: `Buy authentic ${product.name} from Hari Masala`,
-          url: getShareUrl(),
-        })
-      } catch (e) {}
-    } else {
-      handleCopyUrl()
-    }
-  }
-
   let parsedVariants = [{ weight: product.weight || '100g', price: product.price || 0, mrp: product.mrp || product.price || 0 }]
   if (product.variants) {
     let raw: any = null
@@ -125,6 +94,36 @@ export function ProductDetailView({
   }
   if (!Array.isArray(parsedImages) || parsedImages.length === 0) parsedImages = [product.image || '/placeholder.svg']
   const activeImage = parsedImages[activeImageIdx] || product.image || '/placeholder.svg'
+
+  const handleShareWhatsApp = async () => {
+    await shareProductWithImage({
+      product: {
+        ...product,
+        image: activeImage || product.image,
+      },
+      selectedVariant,
+      shareUrl: getShareUrl(),
+    })
+  }
+
+  const handleCopyUrl = async () => {
+    const success = await copyProductLink(getShareUrl())
+    if (success) {
+      setCopiedLink(true)
+      setTimeout(() => setCopiedLink(false), 2500)
+    }
+  }
+
+  const handleNativeShare = async () => {
+    await shareProductWithImage({
+      product: {
+        ...product,
+        image: activeImage || product.image,
+      },
+      selectedVariant,
+      shareUrl: getShareUrl(),
+    })
+  }
 
   const discount = discountPercent(selectedVariant.mrp, selectedVariant.price)
   const outOfStock = (product.stock ?? 50) <= 0

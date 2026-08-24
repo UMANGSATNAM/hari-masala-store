@@ -1,12 +1,13 @@
 'use client'
 
 import Link from 'next/link'
-import { Plus, Star, Check, Minus } from 'lucide-react'
+import { Plus, Star, Check, Minus, Share2 } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useCart } from '@/lib/store'
 import { formatINR, discountPercent } from '@/lib/format'
+import { shareProductWithImage } from '@/lib/share'
 import type { Product } from '@/lib/types'
 import { toast } from 'sonner'
 
@@ -44,6 +45,15 @@ export function ProductCard({ product }: { product: Product }) {
     setTimeout(() => setAdded(false), 1800)
   }
 
+  const handleShare = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    await shareProductWithImage({
+      product,
+      selectedVariant,
+    })
+  }
+
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5">
       {/* Image */}
@@ -56,7 +66,7 @@ export function ProductCard({ product }: { product: Product }) {
             product.image === '/placeholder.svg' ? 'p-6 opacity-70' : ''
           }`}
         />
-        <div className="absolute left-2 top-2 flex flex-col gap-1.5">
+        <div className="absolute left-2 top-2 flex flex-col gap-1.5 z-10">
           {product.featured && (
             <Badge className="bg-saffron-gradient text-secondary-foreground shadow text-[10px] px-2 py-0.5">
               ★ Bestseller
@@ -68,6 +78,15 @@ export function ProductCard({ product }: { product: Product }) {
             </Badge>
           )}
         </div>
+
+        {/* Quick Share Button */}
+        <button
+          onClick={handleShare}
+          title="Share Product with Image"
+          className="absolute right-2 top-2 z-10 grid h-7 w-7 place-items-center rounded-full bg-background/80 text-foreground backdrop-blur-xs shadow-xs transition-transform hover:scale-110 hover:bg-background active:scale-95"
+        >
+          <Share2 className="h-3.5 w-3.5" />
+        </button>
         {outOfStock && (
           <div className="absolute inset-0 grid place-items-center bg-background/70">
             <span className="rounded-md bg-foreground/90 px-3 py-1 text-xs font-semibold text-background">
