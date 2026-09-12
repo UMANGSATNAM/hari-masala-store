@@ -18,7 +18,7 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { api } from '@/lib/api-client'
-import { formatINR } from '@/lib/format'
+import { formatINR, calculateDeliveryCharge } from '@/lib/format'
 import type { Order, OrderItem, Settings } from '@/lib/types'
 import { ORDER_STATUSES, statusColor } from './admin-dashboard'
 import { toast } from 'sonner'
@@ -83,6 +83,31 @@ export function AdminOrders({ settings }: { settings: Settings }) {
     return Array.isArray(items) ? items : []
   }
 
+  const getDeliveryCharge = (o: Order): number => {
+    if (typeof o.deliveryCharge === 'number' && o.deliveryCharge > 0) {
+      return o.deliveryCharge
+    }
+    if (o.total > o.subtotal) {
+      return Math.round(o.total - o.subtotal)
+    }
+    // Backward compatibility calculation for existing orders where total == subtotal:
+    const cityStr = (o.customerCity || '').toLowerCase().trim()
+    const addrStr = (o.customerAddress || '').toLowerCase().trim()
+    const isMumbai = cityStr.includes('mumbai') || addrStr.includes('mumbai')
+    const state = isMumbai ? 'Maharashtra' : (o.customerState || 'Gujarat')
+    const city = isMumbai ? 'mumbai' : (o.customerCity || '')
+    const items = parseItems(o)
+    return calculateDeliveryCharge(items, state, city)
+  }
+
+  const getOrderTotal = (o: Order): number => {
+    const delivery = getDeliveryCharge(o)
+    if (o.total > o.subtotal) {
+      return o.total
+    }
+    return o.subtotal + delivery
+  }
+
   return (
     <div className="space-y-5">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -140,7 +165,18 @@ export function AdminOrders({ settings }: { settings: Settings }) {
                       {parseItems(o).map(it => it.name).join(', ')}
                     </p>
                   </td>
-                  <td className="px-4 py-2.5 font-semibold text-foreground">{formatINR(o.total)}</td>
+                  <td className="px-4 py-2.5">
+                    <p className="font-bold text-foreground">{formatINR(getOrderTotal(o))}</p>
+                    {getDeliveryCharge(o) > 0 ? (
+                      <p className="text-[11px] text-amber-700 dark:text-amber-400 font-medium">
+                        (incl. {formatINR(getDeliveryCharge(o))} delivery)
+                      </p>
+                    ) : (
+                      <p className="text-[10px] text-muted-foreground">
+                        Items: {formatINR(o.subtotal)}
+                      </p>
+                    )}
+                  </td>
                   <td className="px-4 py-2.5 text-muted-foreground text-xs">
                     {new Date(o.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: '2-digit' })}
                   </td>
@@ -190,7 +226,14 @@ export function AdminOrders({ settings }: { settings: Settings }) {
                   <p className="font-medium text-sm text-foreground">{o.customerName}</p>
                   <p className="text-xs text-muted-foreground">{o.customerPhone}</p>
                 </div>
-                <span className="font-bold text-foreground">{formatINR(o.total)}</span>
+                <div className="text-right">
+                  <span className="font-bold text-foreground">{formatINR(getOrderTotal(o))}</span>
+                  {getDeliveryCharge(o) > 0 && (
+                    <p className="text-[10px] text-amber-700 dark:text-amber-400 font-medium">
+                      +{formatINR(getDeliveryCharge(o))} delivery
+                    </p>
+                  )}
+                </div>
               </div>
               <div className="flex items-center justify-between gap-2">
                 <Badge variant="outline" className={`text-[10px] ${statusColor[o.status] || ''}`}>{o.status}</Badge>
@@ -235,6 +278,7 @@ export function AdminOrders({ settings }: { settings: Settings }) {
                 <p className="flex items-start gap-2 text-muted-foreground">
                   <MapPin className="h-3.5 w-3.5 mt-0.5 shrink-0" /> {viewOrder.customerAddress}
                   {viewOrder.customerCity && `, ${viewOrder.customerCity}`}
+                  {viewOrder.customerState && `, ${viewOrder.customerState}`}
                   {viewOrder.customerPincode && ` - ${viewOrder.customerPincode}`}
                 </p>
                 {viewOrder.notes && (
@@ -245,8 +289,8 @@ export function AdminOrders({ settings }: { settings: Settings }) {
               </div>
 
               {/* Items */}
-              <div className="rounded-lg border border-border">
-                <p className="text-xs font-semibold text-muted-foreground uppercase px-3 py-2 border-b border-border">
+              <div className="rounded-lg border border-border overflow-hidden">
+                <p className="text-xs font-semibold text-muted-foreground uppercase px-3 py-2 border-b border-border bg-muted/30">
                   Items ({viewOrder.itemCount})
                 </p>
                 <ul className="divide-y divide-border">
@@ -260,9 +304,32 @@ export function AdminOrders({ settings }: { settings: Settings }) {
                     </li>
                   ))}
                 </ul>
-                <div className="flex justify-between px-3 py-2.5 border-t border-border font-bold">
-                  <span>Total</span>
-                  <span className="text-primary">{formatINR(viewOrder.total)}</span>
+                <div className="border-t border-border px-3.5 py-3 space-y-2 bg-muted/20 text-sm">
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>Products Subtotal</span>
+                    <span>{formatINR(viewOrder.subtotal)}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-muted-foreground">
+                    <span className="flex items-center gap-1.5">
+                      <span>Delivery Charge</span>
+                      {viewOrder.customerCity && (
+                        <span className="text-[11px] text-muted-foreground/80 font-medium">
+                          ({viewOrder.customerCity})
+                        </span>
+                      )}
+                    </span>
+                    <span className={getDeliveryCharge(viewOrder) > 0 ? "font-semibold text-amber-700 dark:text-amber-400" : ""}>
+                      {getDeliveryCharge(viewOrder) > 0
+                        ? formatINR(getDeliveryCharge(viewOrder))
+                        : (viewOrder.customerState && viewOrder.customerState !== 'Gujarat' && !viewOrder.customerCity?.toLowerCase().includes('mumbai')
+                            ? 'Other State (On WhatsApp)'
+                            : '₹0')}
+                    </span>
+                  </div>
+                  <div className="flex justify-between pt-2 border-t border-border font-bold text-base text-foreground">
+                    <span>Full Order Total</span>
+                    <span className="text-primary text-lg">{formatINR(getOrderTotal(viewOrder))}</span>
+                  </div>
                 </div>
               </div>
 

@@ -8,11 +8,24 @@ import { api } from '@/lib/api-client'
 import { useAdmin } from '@/lib/store'
 import type { Category, Product, Settings } from '@/lib/types'
 
+const DEFAULT_SETTINGS: Settings = {
+  id: 'default',
+  storeName: 'Hari Masala',
+  storeTagline: 'Pure Spices, Mukhvas & More — From Unjha',
+  whatsappNumber: '919879873113',
+  freeShipThreshold: 0,
+  adminPin: '1234',
+  heroImage: null,
+  announcement: null,
+  logoImage: null,
+  priceListPdf: null,
+}
+
 export default function Home() {
   const [view, setView] = useState<'store' | 'admin'>('store')
   const isAuthed = useAdmin((s) => s.isAuthed)
 
-  const [settings, setSettings] = useState<Settings | null>(null)
+  const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS)
   const [categories, setCategories] = useState<Category[]>([])
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
@@ -20,46 +33,43 @@ export default function Home() {
   const [activeCategory, setActiveCategory] = useState('all')
   const [search, setSearch] = useState('')
 
-  // Initial data load
+  // Initial data load with mobile-friendly timeout
   useEffect(() => {
+    let mounted = true
+    const fallbackTimer = setTimeout(() => {
+      if (mounted) setLoading(false)
+    }, 7000)
+
     Promise.all([api.getSettings(), api.getCategories(), api.getProducts({ category: 'all' })])
       .then(([s, c, p]) => {
-        setSettings(s?.settings || {
-          id: 'default',
-          storeName: 'Hari Masala',
-          storeTagline: 'Pure & Authentic Indian Spices',
-          whatsappNumber: '919879873113',
-          freeShipThreshold: 499,
-          adminPin: '',
-          heroImage: null,
-          announcement: null,
-          logoImage: null,
-          priceListPdf: null,
-        })
-        setCategories(c?.categories || [])
-        setProducts(p?.products || [])
+        if (!mounted) return
+        if (s?.settings) setSettings(s.settings)
+        if (c?.categories) setCategories(c.categories)
+        if (p?.products) setProducts(p.products)
       })
       .catch((e) => {
         console.error('Load error:', e)
-        setSettings({
-          id: 'default',
-          storeName: 'Hari Masala',
-          storeTagline: 'Pure & Authentic Indian Spices',
-          whatsappNumber: '919879873113',
-          freeShipThreshold: 499,
-          adminPin: '',
-          heroImage: null,
-          announcement: null,
-          logoImage: null,
-          priceListPdf: null,
-        })
       })
-      .finally(() => setLoading(false))
+      .finally(() => {
+        if (mounted) {
+          clearTimeout(fallbackTimer)
+          setLoading(false)
+        }
+      })
+
+    return () => {
+      mounted = false
+      clearTimeout(fallbackTimer)
+    }
   }, [])
 
   const refetchProducts = useCallback(async () => {
-    const { products } = await api.getProducts({ category: 'all' })
-    setProducts(products)
+    try {
+      const { products } = await api.getProducts({ category: 'all' })
+      setProducts(products)
+    } catch (e) {
+      console.error('Refetch products error:', e)
+    }
   }, [])
 
   // Return to the storefront, refreshing products (prices/stock may have changed in admin)
@@ -85,18 +95,6 @@ export default function Home() {
     }
     return list
   }, [products, activeCategory, search])
-
-  // Loading / error gate
-  if (!settings) {
-    return (
-      <div className="min-h-screen grid place-items-center bg-background">
-        <div className="flex flex-col items-center gap-3">
-          <div className="h-10 w-10 rounded-full border-4 border-primary border-t-transparent animate-spin" />
-          <p className="text-sm text-muted-foreground">Loading Hari Masala…</p>
-        </div>
-      </div>
-    )
-  }
 
   // Admin view
   if (view === 'admin') {

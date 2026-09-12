@@ -32,14 +32,16 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { customerName, customerPhone, customerAddress, customerCity, customerPincode, notes, items } = body as {
+    const { customerName, customerPhone, customerAddress, customerCity, customerState, customerPincode, notes, items, deliveryCharge: reqDelivery } = body as {
       customerName: string
       customerPhone: string
       customerAddress: string
       customerCity?: string
+      customerState?: string
       customerPincode?: string
       notes?: string
       items: OrderItem[]
+      deliveryCharge?: number
     }
 
     if (!customerName || !customerPhone || !customerAddress || !items?.length) {
@@ -48,6 +50,8 @@ export async function POST(req: NextRequest) {
 
     const subtotal = items.reduce((s, i) => s + i.price * i.quantity, 0)
     const itemCount = items.reduce((s, i) => s + i.quantity, 0)
+    const deliveryCharge = typeof reqDelivery === 'number' && !isNaN(reqDelivery) ? Math.max(0, reqDelivery) : 0
+    const total = subtotal + deliveryCharge
     const orderNumber = genOrderNumber()
 
     const order = await db.order.create({
@@ -57,12 +61,14 @@ export async function POST(req: NextRequest) {
         customerPhone,
         customerAddress,
         customerCity: customerCity || null,
+        customerState: customerState || 'Gujarat',
         customerPincode: customerPincode || null,
         notes: notes || null,
         items: JSON.stringify(items),
         itemCount,
         subtotal,
-        total: subtotal,
+        deliveryCharge,
+        total,
         status: 'PENDING',
       },
     })

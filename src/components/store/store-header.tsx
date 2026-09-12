@@ -1,12 +1,13 @@
 'use client'
 
 import Link from 'next/link'
-import { Flame, Search, ShoppingCart, Menu, X, Headphones } from 'lucide-react'
+import { Flame, Search, ShoppingCart, Menu, X, Headphones, FileDown } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useCart } from '@/lib/store'
 import type { Settings } from '@/lib/types'
+import { toast } from 'sonner'
 
 export function StoreHeader({
   settings,
@@ -38,6 +39,20 @@ export function StoreHeader({
     { label: 'Why Us', href: '/#features' },
     { label: 'Contact', href: '/#contact' },
   ]
+
+  const handleDownloadPdf = (e?: React.MouseEvent) => {
+    e?.stopPropagation()
+    if (typeof window === 'undefined' || typeof document === 'undefined') return
+    const pdfUrl = settings?.priceListPdf || '/Hari_Masala_Price_List.pdf'
+    toast.success('Downloading Hari Masala Price List PDF...')
+    const link = document.createElement('a')
+    link.href = pdfUrl
+    link.download = 'Hari_Masala_Price_List.pdf'
+    link.target = '_blank'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
 
   return (
     <header className="sticky top-0 z-40 bg-white border-b border-border shadow-sm">
@@ -174,6 +189,16 @@ export function StoreHeader({
               {l.label}
             </Link>
           ))}
+          {/* PDF Download Button in Desktop Menu */}
+          <button
+            type="button"
+            onClick={handleDownloadPdf}
+            className="ml-2 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-amber-800 bg-amber-50/90 hover:bg-amber-100 hover:text-amber-900 border border-amber-300/80 rounded-md transition-all shadow-xs cursor-pointer active:scale-95"
+            title="Download Hari Masala Price List (PDF)"
+          >
+            <FileDown className="h-3.5 w-3.5 text-amber-600" />
+            <span>Price List (PDF)</span>
+          </button>
           <span className="ml-auto text-xs text-muted-foreground">
             Order on WhatsApp
           </span>
@@ -182,7 +207,7 @@ export function StoreHeader({
 
       {/* Mobile nav drawer */}
       {menuOpen && (
-        <nav className="md:hidden border-t border-border bg-white px-4 py-3 flex flex-col gap-1">
+        <nav className="md:hidden border-t border-border bg-white px-4 py-3 flex flex-col gap-1 shadow-lg">
           {navLinks.map((l) => (
             <Link
               key={l.href}
@@ -193,6 +218,26 @@ export function StoreHeader({
               {l.label}
             </Link>
           ))}
+
+          {/* PDF Download Option below all menus */}
+          <div className="pt-2.5 mt-1.5 border-t border-border">
+            <button
+              type="button"
+              onClick={() => {
+                setMenuOpen(false)
+                handleDownloadPdf()
+              }}
+              className="w-full flex items-center justify-between px-3.5 py-2.5 text-sm font-bold text-amber-950 bg-gradient-to-r from-amber-50 to-amber-100/90 hover:from-amber-100 hover:to-amber-200/90 rounded-lg border border-amber-300/80 transition-all shadow-xs active:scale-[0.99] cursor-pointer"
+            >
+              <span className="flex items-center gap-2">
+                <FileDown className="h-4 w-4 text-amber-700 shrink-0" />
+                <span>Download Price List (PDF)</span>
+              </span>
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-800 bg-amber-200/80 px-2 py-0.5 rounded-full border border-amber-300/60">
+                PDF
+              </span>
+            </button>
+          </div>
         </nav>
       )}
     </header>

@@ -10,7 +10,6 @@ import { StoreFooter } from './store-footer'
 import { CartDrawer } from './cart-drawer'
 import { CheckoutDialog } from './checkout-dialog'
 import { WhatsAppFloatingButton } from './whatsapp-floating-button'
-import { PriceListBanner } from './price-list-banner'
 import type { Category, Product, Settings } from '@/lib/types'
 
 export function Storefront({
@@ -41,7 +40,6 @@ export function Storefront({
       <StoreHeader settings={settings} onSearch={onSearch} />
       <main className="flex-1">
         <Hero settings={settings} />
-        <PriceListBanner settings={settings} />
         <CategoryCards
           categories={categories}
           products={products}

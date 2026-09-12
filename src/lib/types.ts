@@ -65,10 +65,12 @@ export type Order = {
   customerPhone: string
   customerAddress: string
   customerCity: string | null
+  customerState?: string | null
   customerPincode: string | null
   items: string
   itemCount: number
   subtotal: number
+  deliveryCharge?: number | null
   total: number
   status: string
   notes: string | null

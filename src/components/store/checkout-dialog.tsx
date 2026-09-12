@@ -84,8 +84,10 @@ export function CheckoutDialog({
         customerPhone: form.phone.trim(),
         customerAddress: form.address.trim(),
         customerCity: form.city.trim() || undefined,
+        customerState: form.state.trim() || 'Gujarat',
         customerPincode: form.pincode.trim() || undefined,
         notes: form.notes.trim() || undefined,
+        deliveryCharge: deliveryCharge !== undefined ? deliveryCharge : 0,
         items: orderItems,
       })
 

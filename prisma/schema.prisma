@@ -49,10 +49,12 @@ model Order {
   customerPhone   String
   customerAddress String
   customerCity    String?
+  customerState   String?  @default("Gujarat")
   customerPincode String?
   items           String   @db.LongText
   itemCount       Int      @default(0)
   subtotal        Float
+  deliveryCharge  Float    @default(0)
   total           Float
   status          String   @default("PENDING")
   notes           String?  @db.Text

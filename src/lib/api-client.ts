@@ -1,22 +1,32 @@
 import type { Category, Order, Product, Settings } from './types'
 
 async function jfetch<T>(url: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(url, {
-    cache: 'no-store',
-    ...init,
-    headers: {
-      'Content-Type': 'application/json',
-      'Cache-Control': 'no-cache, no-store, must-revalidate',
-      'Pragma': 'no-cache',
-      'Expires': '0',
-      ...init?.headers,
-    },
-  })
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}))
-    throw new Error((err as { error?: string }).error || `Request failed: ${res.status}`)
+  const controller = typeof AbortController !== 'undefined' ? new AbortController() : null
+  const timeoutId = controller ? setTimeout(() => controller.abort(), 12000) : null
+
+  try {
+    const res = await fetch(url, {
+      cache: 'no-store',
+      signal: init?.signal || controller?.signal,
+      ...init,
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+        ...init?.headers,
+      },
+    })
+    if (timeoutId) clearTimeout(timeoutId)
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}))
+      throw new Error((err as { error?: string }).error || `Request failed: ${res.status}`)
+    }
+    return res.json() as Promise<T>
+  } catch (e) {
+    if (timeoutId) clearTimeout(timeoutId)
+    throw e
   }
-  return res.json() as Promise<T>
 }
 
 export const api = {
@@ -52,8 +62,10 @@ export const api = {
     customerPhone: string
     customerAddress: string
     customerCity?: string
+    customerState?: string
     customerPincode?: string
     notes?: string
+    deliveryCharge?: number
     items: { id: string; name: string; gujaratiName: string | null; price: number; quantity: number; weight: string }[]
   }) => jfetch<{ order: Order }>(`/api/orders`, { method: 'POST', body: JSON.stringify(data) }),
   getOrders: (status?: string) => {
