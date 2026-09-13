@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import {
-  Eye, Trash2, Phone, MapPin, Package, Loader2, MessageCircle,
+  Eye, Trash2, Phone, MapPin, Package, Loader2, MessageCircle, Printer,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -19,6 +19,8 @@ import {
 } from '@/components/ui/alert-dialog'
 import { api } from '@/lib/api-client'
 import { formatINR, calculateDeliveryCharge } from '@/lib/format'
+import { parseOrderItems, getOrderDeliveryCharge, getFullOrderTotal } from '@/lib/order-utils'
+import { OrderInvoiceModal } from './order-invoice-modal'
 import type { Order, OrderItem, Settings } from '@/lib/types'
 import { ORDER_STATUSES, statusColor } from './admin-dashboard'
 import { toast } from 'sonner'
@@ -30,6 +32,7 @@ export function AdminOrders({ settings }: { settings: Settings }) {
   const [loading, setLoading] = useState(true)
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [viewOrder, setViewOrder] = useState<Order | null>(null)
+  const [invoiceOrder, setInvoiceOrder] = useState<Order | null>(null)
   const [deleteId, setDeleteId] = useState<string | null>(null)
 
   const load = useCallback(async () => {
@@ -72,41 +75,9 @@ export function AdminOrders({ settings }: { settings: Settings }) {
     }
   }
 
-  const parseItems = (o: Order): OrderItem[] => {
-    let items: any = o.items;
-    if (typeof items === 'string') {
-      try { items = JSON.parse(items) } catch { return [] }
-    }
-    if (typeof items === 'string') {
-      try { items = JSON.parse(items) } catch { return [] }
-    }
-    return Array.isArray(items) ? items : []
-  }
-
-  const getDeliveryCharge = (o: Order): number => {
-    if (typeof o.deliveryCharge === 'number' && o.deliveryCharge > 0) {
-      return o.deliveryCharge
-    }
-    if (o.total > o.subtotal) {
-      return Math.round(o.total - o.subtotal)
-    }
-    // Backward compatibility calculation for existing orders where total == subtotal:
-    const cityStr = (o.customerCity || '').toLowerCase().trim()
-    const addrStr = (o.customerAddress || '').toLowerCase().trim()
-    const isMumbai = cityStr.includes('mumbai') || addrStr.includes('mumbai')
-    const state = isMumbai ? 'Maharashtra' : (o.customerState || 'Gujarat')
-    const city = isMumbai ? 'mumbai' : (o.customerCity || '')
-    const items = parseItems(o)
-    return calculateDeliveryCharge(items, state, city)
-  }
-
-  const getOrderTotal = (o: Order): number => {
-    const delivery = getDeliveryCharge(o)
-    if (o.total > o.subtotal) {
-      return o.total
-    }
-    return o.subtotal + delivery
-  }
+  const parseItems = parseOrderItems
+  const getDeliveryCharge = getOrderDeliveryCharge
+  const getOrderTotal = getFullOrderTotal
 
   return (
     <div className="space-y-5">
@@ -194,6 +165,15 @@ export function AdminOrders({ settings }: { settings: Settings }) {
                   </td>
                   <td className="px-4 py-2.5">
                     <div className="flex justify-end gap-1">
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-8 w-8 text-primary hover:text-primary hover:bg-primary/10"
+                        title="Print Order Invoice"
+                        onClick={() => setInvoiceOrder(o)}
+                      >
+                        <Printer className="h-4 w-4" />
+                      </Button>
                       <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setViewOrder(o)}>
                         <Eye className="h-4 w-4" />
                       </Button>
@@ -238,6 +218,9 @@ export function AdminOrders({ settings }: { settings: Settings }) {
               <div className="flex items-center justify-between gap-2">
                 <Badge variant="outline" className={`text-[10px] ${statusColor[o.status] || ''}`}>{o.status}</Badge>
                 <div className="flex gap-1">
+                  <Button size="sm" variant="outline" className="h-7 text-primary hover:text-primary" onClick={() => setInvoiceOrder(o)}>
+                    <Printer className="h-3.5 w-3.5 mr-1" /> Print
+                  </Button>
                   <Button size="sm" variant="outline" className="h-7" onClick={() => setViewOrder(o)}>
                     <Eye className="h-3.5 w-3.5 mr-1" /> View
                   </Button>
@@ -346,18 +329,36 @@ export function AdminOrders({ settings }: { settings: Settings }) {
                 </Select>
               </div>
 
-              <a
-                href={`https://wa.me/${viewOrder.customerPhone.replace(/\D/g, '').slice(-10)}`}
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center justify-center gap-2 rounded-lg bg-green-600 hover:bg-green-700 text-white py-2.5 text-sm font-semibold"
-              >
-                <MessageCircle className="h-4 w-4" /> Message Customer on WhatsApp
-              </a>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setInvoiceOrder(viewOrder)}
+                  className="flex items-center justify-center gap-2 py-2.5 text-sm font-semibold border-primary/40 text-primary hover:bg-primary/10"
+                >
+                  <Printer className="h-4 w-4" /> Print Order Invoice
+                </Button>
+                <a
+                  href={`https://wa.me/${viewOrder.customerPhone.replace(/\D/g, '').slice(-10)}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center justify-center gap-2 rounded-lg bg-green-600 hover:bg-green-700 text-white py-2.5 text-sm font-semibold"
+                >
+                  <MessageCircle className="h-4 w-4" /> WhatsApp Customer
+                </a>
+              </div>
             </div>
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Invoice Print & Preview Modal */}
+      <OrderInvoiceModal
+        order={invoiceOrder}
+        settings={settings}
+        open={!!invoiceOrder}
+        onOpenChange={(v) => !v && setInvoiceOrder(null)}
+      />
 
       {/* Delete confirm */}
       <AlertDialog open={!!deleteId} onOpenChange={(v) => !v && setDeleteId(null)}>

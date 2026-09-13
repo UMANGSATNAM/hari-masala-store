@@ -24,6 +24,7 @@ import {
 import { useCart } from '@/lib/store'
 import { api } from '@/lib/api-client'
 import { formatINR, buildWhatsAppOrder, calculateDeliveryCharge } from '@/lib/format'
+import { lookupPincode, INDIAN_STATES } from '@/lib/pincode'
 import type { Settings } from '@/lib/types'
 import { toast } from 'sonner'
 
@@ -47,6 +48,8 @@ export function CheckoutDialog({
     notes: '',
   })
   const [loading, setLoading] = useState(false)
+  const [pincodeLoading, setPincodeLoading] = useState(false)
+  const [pincodeDetected, setPincodeDetected] = useState<string | null>(null)
   const [done, setDone] = useState(false)
 
   const total = subtotal()
@@ -57,6 +60,35 @@ export function CheckoutDialog({
 
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }))
+
+  const handlePincodeChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value.replace(/\D/g, '').slice(0, 6)
+    setForm((f) => ({ ...f, pincode: val }))
+
+    if (val.length === 6) {
+      setPincodeLoading(true)
+      try {
+        const res = await lookupPincode(val)
+        if (res.success && res.state) {
+          setForm((f) => ({
+            ...f,
+            state: res.state || f.state,
+            city: f.city.trim() ? f.city : (res.city || f.city),
+          }))
+          setPincodeDetected(res.state)
+          toast.success(`State detected: ${res.state}${res.city ? ` (${res.city})` : ''}`)
+        } else {
+          setPincodeDetected(null)
+        }
+      } catch {
+        setPincodeDetected(null)
+      } finally {
+        setPincodeLoading(false)
+      }
+    } else {
+      setPincodeDetected(null)
+    }
+  }
 
   const valid =
     form.name.trim() &&
@@ -125,6 +157,8 @@ export function CheckoutDialog({
     onOpenChange(v)
     if (!v && done) {
       setDone(false)
+      setPincodeDetected(null)
+      setPincodeLoading(false)
       setForm({ name: '', phone: '', address: '', city: '', state: 'Gujarat', pincode: '', notes: '' })
     }
   }
@@ -204,54 +238,72 @@ export function CheckoutDialog({
             </div>
 
             <div className="grid gap-3">
-              <div className="grid gap-1.5">
-                <Label htmlFor="name">Full Name *</Label>
-                <Input id="name" value={form.name} onChange={set('name')} placeholder="e.g. Rahul Sharma" />
-              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid gap-1.5">
+                  <Label htmlFor="name">Full Name *</Label>
+                  <Input id="name" value={form.name} onChange={set('name')} placeholder="e.g. Rahul Sharma" />
+                </div>
                 <div className="grid gap-1.5">
                   <Label htmlFor="phone">Phone (WhatsApp) *</Label>
                   <Input id="phone" inputMode="numeric" value={form.phone} onChange={set('phone')} placeholder="10-digit number" />
                 </div>
-                <div className="grid gap-1.5">
-                  <Label htmlFor="pincode">Pincode</Label>
-                  <Input id="pincode" value={form.pincode} onChange={set('pincode')} placeholder="e.g. 380015" />
+              </div>
+
+              {/* Delivery Address Box */}
+              <div className="rounded-lg border border-border/80 bg-muted/20 p-3 space-y-3">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="address" className="font-semibold text-foreground">Delivery Address *</Label>
+                  <span className="text-[11px] text-muted-foreground">Enter Pincode for auto state</span>
+                </div>
+                <Textarea id="address" value={form.address} onChange={set('address')} rows={2} placeholder="House/Flat no, building, street, area, landmark…" />
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+                  <div className="grid gap-1.5">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="pincode">Pincode *</Label>
+                      {pincodeLoading && (
+                        <span className="flex items-center gap-1 text-[10px] text-primary font-medium animate-pulse">
+                          <Loader2 className="h-2.5 w-2.5 animate-spin" /> Fetching…
+                        </span>
+                      )}
+                      {pincodeDetected && !pincodeLoading && (
+                        <span className="text-[10px] text-green-700 dark:text-green-400 font-medium">
+                          ✓ Auto-fetched
+                        </span>
+                      )}
+                    </div>
+                    <Input
+                      id="pincode"
+                      inputMode="numeric"
+                      maxLength={6}
+                      value={form.pincode}
+                      onChange={handlePincodeChange}
+                      placeholder="e.g. 380015"
+                    />
+                  </div>
+                  <div className="grid gap-1.5">
+                    <Label htmlFor="city">City / District</Label>
+                    <Input id="city" value={form.city} onChange={set('city')} placeholder="e.g. Ahmedabad" />
+                  </div>
+                  <div className="grid gap-1.5">
+                    <Label htmlFor="state">State *</Label>
+                    <Select value={form.state} onValueChange={(v) => setForm(f => ({ ...f, state: v }))}>
+                      <SelectTrigger id="state">
+                        <SelectValue placeholder="Select State" />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-64">
+                        {INDIAN_STATES.map((state) => (
+                          <SelectItem key={state} value={state}>{state}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </div>
-              <div className="grid gap-1.5">
-                <Label htmlFor="address">Delivery Address *</Label>
-                <Textarea id="address" value={form.address} onChange={set('address')} rows={2} placeholder="House no, street, area, landmark…" />
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="grid gap-1.5">
-                  <Label htmlFor="city">City</Label>
-                  <Input id="city" value={form.city} onChange={set('city')} placeholder="e.g. Ahmedabad" />
-                </div>
-                <div className="grid gap-1.5">
-                  <Label htmlFor="state">State *</Label>
-                  <Select value={form.state} onValueChange={(v) => setForm(f => ({ ...f, state: v }))}>
-                    <SelectTrigger id="state">
-                      <SelectValue placeholder="Select State" />
-                    </SelectTrigger>
-                    <SelectContent className="max-h-64">
-                      {[
-                        "Andaman and Nicobar Islands", "Andhra Pradesh", "Arunachal Pradesh", "Assam", 
-                        "Bihar", "Chandigarh", "Chhattisgarh", "Dadra and Nagar Haveli and Daman and Diu", 
-                        "Delhi", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jammu and Kashmir", 
-                        "Jharkhand", "Karnataka", "Kerala", "Ladakh", "Lakshadweep", "Madhya Pradesh", 
-                        "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", 
-                        "Puducherry", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", 
-                        "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal"
-                      ].map(state => (
-                        <SelectItem key={state} value={state}>{state}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+
               <div className="grid gap-1.5">
                 <Label htmlFor="notes">Order Notes (optional)</Label>
-                <Textarea id="notes" value={form.notes} onChange={set('notes')} rows={2} placeholder="Any special instructions…" />
+                <Textarea id="notes" value={form.notes} onChange={set('notes')} rows={2} placeholder="Any special delivery instructions…" />
               </div>
             </div>
           </>
