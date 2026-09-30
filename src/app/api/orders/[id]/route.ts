@@ -5,6 +5,23 @@ export const dynamic = 'force-dynamic'
 export const revalidate = 0
 export const fetchCache = 'force-no-store'
 
+export async function GET(
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params
+    const order = await db.order.findUnique({ where: { id } })
+    if (!order) {
+      return NextResponse.json({ error: 'Order not found' }, { status: 404 })
+    }
+    return NextResponse.json({ order })
+  } catch (e) {
+    console.error('Fetch single order error:', e)
+    return NextResponse.json({ error: 'Failed to fetch order' }, { status: 500 })
+  }
+}
+
 export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }

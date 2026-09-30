@@ -11,11 +11,13 @@ export const fetchCache = 'force-no-store'
 
 import ImageKit from "imagekit";
 
-const imagekit = new ImageKit({
-  publicKey: process.env.IMAGEKIT_PUBLIC_KEY || "",
-  privateKey: process.env.IMAGEKIT_PRIVATE_KEY || "",
-  urlEndpoint: process.env.IMAGEKIT_URL_ENDPOINT || ""
-});
+function getImageKit() {
+  const publicKey = process.env.IMAGEKIT_PUBLIC_KEY
+  const privateKey = process.env.IMAGEKIT_PRIVATE_KEY
+  const urlEndpoint = process.env.IMAGEKIT_URL_ENDPOINT
+  if (!publicKey || !privateKey || !urlEndpoint) return null
+  return new ImageKit({ publicKey, privateKey, urlEndpoint })
+}
 
 // Handle image upload when Content-Type is multipart/form-data
 async function handleUpload(req: NextRequest) {
@@ -36,18 +38,27 @@ async function handleUpload(req: NextRequest) {
     const filename = `${randomUUID()}.${ext}`
     const bytes = await file.arrayBuffer()
     
-    // Upload to ImageKit directly instead of local filesystem
-    const uploadResult = await new Promise((resolve, reject) => {
-      imagekit.upload({
-        file: Buffer.from(bytes),
-        fileName: filename,
-      }, (err, res) => {
-        if (err) reject(err);
-        else resolve(res);
+    const ik = getImageKit()
+    if (ik) {
+      // Upload to ImageKit directly if configured
+      const uploadResult = await new Promise((resolve, reject) => {
+        ik.upload({
+          file: Buffer.from(bytes),
+          fileName: filename,
+        }, (err, res) => {
+          if (err) reject(err);
+          else resolve(res);
+        });
       });
-    });
+      return NextResponse.json({ url: (uploadResult as any).url, filename })
+    }
 
-    return NextResponse.json({ url: (uploadResult as any).url, filename })
+    // Fallback to local upload directory if ImageKit keys are not present
+    const uploadDir = path.join(process.cwd(), 'public', 'uploads')
+    await mkdir(uploadDir, { recursive: true })
+    const filePath = path.join(uploadDir, filename)
+    await writeFile(filePath, Buffer.from(bytes))
+    return NextResponse.json({ url: `/uploads/${filename}`, filename })
   } catch (e) {
     console.error('Upload error:', e)
     return NextResponse.json({ error: 'Upload failed' }, { status: 500 })

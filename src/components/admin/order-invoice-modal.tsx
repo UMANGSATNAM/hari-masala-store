@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useRef } from 'react'
-import { Printer, X, Download, Store } from 'lucide-react'
+import React from 'react'
+import { Printer, ExternalLink, ShieldCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -13,16 +13,14 @@ import { formatINR } from '@/lib/format'
 import { parseOrderItems, getOrderDeliveryCharge, getFullOrderTotal, formatOrderDate } from '@/lib/order-utils'
 import type { Order, Settings } from '@/lib/types'
 
-export function triggerPrintInvoice(order: Order, settings: Settings) {
+/**
+ * Returns clean HTML of the invoice card (to inject inside in-page #invoice-print-section)
+ */
+export function getInvoiceCardHtml(order: Order, settings: Settings): string {
   const items = parseOrderItems(order)
   const deliveryCharge = getOrderDeliveryCharge(order)
   const total = getFullOrderTotal(order)
   const dateFormatted = formatOrderDate(order.createdAt)
-
-  const logoSrc = settings.logoImage || '/logo.png'
-  const fullLogoUrl = logoSrc.startsWith('http')
-    ? logoSrc
-    : `${window.location.origin}${logoSrc.startsWith('/') ? '' : '/'}${logoSrc}`
 
   const itemsRows = items
     .map((item, idx) => {
@@ -56,16 +54,112 @@ export function triggerPrintInvoice(order: Order, settings: Settings) {
       ? 'Other State (On WhatsApp)'
       : 'FREE (₹0)'
 
-  const htmlContent = `
+  return `
+    <div class="invoice-card" style="max-width: 800px; margin: 0 auto; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 24px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #111827; font-size: 13px; line-height: 1.5;">
+      <!-- Header -->
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #15803d; padding-bottom: 16px; margin-bottom: 20px;">
+        <div>
+          <h1 style="margin: 0; font-size: 26px; font-weight: 900; color: #15803d; letter-spacing: -0.5px; text-transform: uppercase;">Sandip Patel</h1>
+          <div style="font-size: 15px; font-weight: 800; color: #111827; margin-top: 4px;">Mo No :- 7359487611</div>
+          <p style="margin: 2px 0 0 0; font-size: 12px; color: #6b7280;">Pure & Authentic Indian Spices &bull; Gujarat, India</p>
+        </div>
+        <div style="text-align: right;">
+          <div style="display: inline-block; background-color: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; padding: 4px 10px; border-radius: 6px; font-size: 13px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase;">
+            Order Invoice
+          </div>
+          <div style="margin-top: 8px; font-size: 12px; color: #4b5563;">
+            <div>Invoice #: <strong style="color: #111827;">${order.orderNumber}</strong></div>
+            <div>Date: <strong style="color: #111827;">${dateFormatted}</strong></div>
+            <div>Status: <strong style="color: #15803d;">${order.status}</strong></div>
+            <div>Payment: <strong style="color: #111827;">WhatsApp Order / COD</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Customer / Shipping Details -->
+      <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px 16px; margin-bottom: 20px; display: flex; justify-content: space-between; gap: 16px;">
+        <div style="flex: 1;">
+          <h3 style="margin: 0 0 6px 0; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #6b7280;">Bill To / Ship To:</h3>
+          <div style="font-size: 15px; font-weight: 700; color: #111827; margin-bottom: 3px;">${order.customerName}</div>
+          <div style="font-size: 12px; color: #374151; margin: 2px 0;"><strong>Phone:</strong> ${order.customerPhone}</div>
+          <div style="font-size: 12px; color: #374151; margin: 2px 0;"><strong>Address:</strong> ${fullAddress}</div>
+          ${order.notes ? `<div style="margin-top: 6px; font-style: italic; color: #4b5563; font-size: 12px;"><strong>Note:</strong> ${order.notes}</div>` : ''}
+        </div>
+        <div style="max-width: 220px; text-align: right;">
+          <h3 style="margin: 0 0 6px 0; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #6b7280;">Dispatched By:</h3>
+          <div style="font-weight: 700; color: #111827; font-size: 14px;">Sandip Patel</div>
+          <div style="font-size: 12px; font-weight: 600; color: #15803d; margin: 2px 0;">Mo No :- 7359487611</div>
+          <div style="font-size: 12px; color: #374151; margin: 2px 0;">Gujarat, India</div>
+        </div>
+      </div>
+
+      <!-- Items Table -->
+      <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+        <thead>
+          <tr style="background-color: #f3f4f6; border-bottom: 2px solid #e5e7eb;">
+            <th style="padding: 8px 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #4b5563; width: 36px; text-align: center;">#</th>
+            <th style="padding: 8px 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #4b5563; text-align: left;">Item Description</th>
+            <th style="padding: 8px 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #4b5563; width: 100px; text-align: right;">Price</th>
+            <th style="padding: 8px 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #4b5563; width: 60px; text-align: center;">Qty</th>
+            <th style="padding: 8px 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #4b5563; width: 110px; text-align: right;">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${itemsRows}
+        </tbody>
+      </table>
+
+      <!-- Totals Summary -->
+      <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
+        <div style="width: 280px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px 16px;">
+          <div style="display: flex; justify-content: space-between; padding: 4px 0; font-size: 13px; color: #4b5563;">
+            <span>Items Subtotal:</span>
+            <span>${formatINR(order.subtotal)}</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding: 4px 0; font-size: 13px; color: #4b5563;">
+            <span>Delivery Charge:</span>
+            <span>${deliveryDisplay}</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; border-top: 2px solid #15803d; padding-top: 8px; margin-top: 6px; font-size: 16px; font-weight: 800; color: #15803d;">
+            <span>Grand Total:</span>
+            <span>${formatINR(total)}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Terms & Conditions -->
+      <div style="border: 1px dashed #d1d5db; background-color: #fdfdfd; border-radius: 6px; padding: 10px 14px; margin-top: 16px;">
+        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: #6b7280; margin-bottom: 4px; letter-spacing: 0.5px;">Terms & Conditions / Policy</div>
+        <div style="font-size: 11px; font-weight: 700; color: #dc2626; margin-bottom: 3px;">&bull; Strictly No Return &amp; No Exchange on food &amp; spice products.</div>
+        <div style="font-size: 10px; color: #6b7280; line-height: 1.4; margin: 2px 0;">&bull; All spices &amp; products are freshly prepared, vacuum/hygienically packed and sealed.</div>
+        <div style="font-size: 10px; color: #6b7280; line-height: 1.4; margin: 2px 0;">&bull; For any issues regarding your shipment, please notify on Call / WhatsApp (<strong>Mo No :- 7359487611</strong>) within 24 hours of delivery.</div>
+        <div style="font-size: 10px; color: #6b7280; line-height: 1.4; margin: 2px 0;">&bull; This is a computer-generated invoice and does not require an authorized signature.</div>
+      </div>
+
+      <div style="text-align: center; font-size: 11px; font-weight: 600; color: #6b7280; margin-top: 20px; padding-top: 12px; border-top: 1px solid #f3f4f6;">
+        Thank you for your order! &bull; Sandip Patel &bull; Mo No :- 7359487611
+      </div>
+    </div>
+  `
+}
+
+/**
+ * Returns a complete standalone HTML document for clean printing or opening in new window
+ */
+export function getInvoiceFullHtml(order: Order, settings: Settings): string {
+  const cardHtml = getInvoiceCardHtml(order, settings)
+
+  return `
     <!DOCTYPE html>
     <html lang="en">
     <head>
       <meta charset="utf-8">
-      <title>Invoice - ${order.orderNumber}</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Invoice - ${order.orderNumber} - Sandip Patel</title>
       <style>
         @page {
           size: A4 portrait;
-          margin: 10mm 12mm;
+          margin: 8mm 10mm;
         }
         * {
           box-sizing: border-box;
@@ -75,286 +169,168 @@ export function triggerPrintInvoice(order: Order, settings: Settings) {
         body {
           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
           color: #111827;
-          background: #ffffff;
+          background: #f3f4f6;
           margin: 0;
           padding: 16px;
           font-size: 13px;
           line-height: 1.5;
         }
-        .invoice-card {
-          max-width: 800px;
-          margin: 0 auto;
-          background: #ffffff;
-          border: 1px solid #e5e7eb;
-          border-radius: 8px;
-          padding: 24px;
-        }
-        .header-row {
+        .no-print {
           display: flex;
           justify-content: space-between;
-          align-items: flex-start;
-          border-bottom: 2px solid #15803d;
-          padding-bottom: 16px;
-          margin-bottom: 20px;
-        }
-        .brand-col {
-          display: flex;
           align-items: center;
-          gap: 14px;
-        }
-        .logo-img {
-          height: 64px;
-          width: auto;
-          max-width: 140px;
-          object-fit: contain;
-        }
-        .brand-info h1 {
-          margin: 0;
-          font-size: 24px;
-          font-weight: 800;
-          color: #15803d;
-          letter-spacing: -0.5px;
-        }
-        .brand-info p {
-          margin: 2px 0 0 0;
-          font-size: 12px;
-          color: #6b7280;
-        }
-        .invoice-meta {
-          text-align: right;
-        }
-        .invoice-title {
-          display: inline-block;
-          background-color: #f0fdf4;
-          color: #15803d;
+          background: #f0fdf4;
           border: 1px solid #bbf7d0;
-          padding: 4px 10px;
-          border-radius: 6px;
-          font-size: 13px;
-          font-weight: 700;
-          letter-spacing: 0.5px;
-          text-transform: uppercase;
-        }
-        .meta-details {
-          margin-top: 8px;
-          font-size: 12px;
-          color: #4b5563;
-        }
-        .meta-details strong {
-          color: #111827;
-        }
-        .customer-section {
-          background-color: #f9fafb;
-          border: 1px solid #e5e7eb;
           border-radius: 8px;
-          padding: 14px 16px;
-          margin-bottom: 20px;
-          display: flex;
-          justify-content: space-between;
-          gap: 16px;
+          padding: 12px 18px;
+          max-width: 800px;
+          margin: 0 auto 16px auto;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.06);
         }
-        .cust-col {
-          flex: 1;
-        }
-        .cust-col h3 {
-          margin: 0 0 6px 0;
-          font-size: 11px;
+        .btn-print {
+          background-color: #15803d;
+          color: #ffffff;
+          border: none;
+          padding: 8px 16px;
+          border-radius: 6px;
           font-weight: 700;
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-          color: #6b7280;
+          font-size: 13px;
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
         }
-        .cust-name {
-          font-size: 15px;
-          font-weight: 700;
-          color: #111827;
-          margin-bottom: 3px;
+        .btn-print:hover {
+          background-color: #166534;
         }
-        .cust-text {
-          font-size: 12px;
+        .btn-close {
+          background-color: #e5e7eb;
           color: #374151;
-          margin: 2px 0;
-        }
-        table.items-table {
-          width: 100%;
-          border-collapse: collapse;
-          margin-bottom: 20px;
-        }
-        table.items-table th {
-          background-color: #f3f4f6;
-          padding: 8px 12px;
-          font-size: 11px;
-          font-weight: 700;
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-          color: #4b5563;
-          border-bottom: 2px solid #e5e7eb;
-        }
-        .summary-wrapper {
-          display: flex;
-          justify-content: flex-end;
-          margin-bottom: 24px;
-        }
-        .summary-box {
-          width: 280px;
-          background: #f9fafb;
-          border: 1px solid #e5e7eb;
-          border-radius: 8px;
-          padding: 12px 16px;
-        }
-        .summary-row {
-          display: flex;
-          justify-content: space-between;
-          padding: 4px 0;
-          font-size: 13px;
-          color: #4b5563;
-        }
-        .summary-row.total-row {
-          border-top: 2px solid #15803d;
-          padding-top: 8px;
-          margin-top: 6px;
-          font-size: 16px;
-          font-weight: 800;
-          color: #15803d;
-        }
-        .terms-box {
-          border: 1px dashed #d1d5db;
-          background-color: #fdfdfd;
+          border: none;
+          padding: 8px 14px;
           border-radius: 6px;
-          padding: 10px 14px;
-          margin-top: 16px;
+          font-weight: 600;
+          font-size: 13px;
+          cursor: pointer;
+          margin-left: 8px;
         }
-        .terms-title {
-          font-size: 10px;
-          font-weight: 700;
-          text-transform: uppercase;
-          color: #6b7280;
-          margin-bottom: 4px;
-          letter-spacing: 0.5px;
+        .btn-close:hover {
+          background-color: #d1d5db;
         }
-        .terms-highlight {
-          font-size: 11px;
-          font-weight: 700;
-          color: #dc2626;
-          margin-bottom: 3px;
-        }
-        .terms-text {
-          font-size: 10px;
-          color: #6b7280;
-          line-height: 1.4;
-          margin: 2px 0;
-        }
-        .footer-note {
-          text-align: center;
-          font-size: 11px;
-          color: #9ca3af;
-          margin-top: 20px;
-          padding-top: 12px;
-          border-top: 1px solid #f3f4f6;
+        @media print {
+          body {
+            background: #ffffff !important;
+            padding: 0 !important;
+            margin: 0 !important;
+          }
+          .no-print {
+            display: none !important;
+          }
+          .invoice-card {
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            max-width: 100% !important;
+          }
         }
       </style>
     </head>
     <body>
-      <div class="invoice-card">
-        <!-- Header -->
-        <div class="header-row">
-          <div class="brand-col">
-            <img src="${fullLogoUrl}" alt="${settings.storeName}" class="logo-img" onerror="this.style.display='none'" />
-            <div class="brand-info">
-              <h1>${settings.storeName}</h1>
-              <p>${settings.storeTagline}</p>
-              <p>WhatsApp / Call: <strong>+${settings.whatsappNumber}</strong></p>
-            </div>
-          </div>
-          <div class="invoice-meta">
-            <div class="invoice-title">Order Invoice</div>
-            <div class="meta-details">
-              <div>Invoice #: <strong>${order.orderNumber}</strong></div>
-              <div>Date: <strong>${dateFormatted}</strong></div>
-              <div>Status: <strong>${order.status}</strong></div>
-              <div>Payment: <strong>WhatsApp Order / COD</strong></div>
-            </div>
-          </div>
+      <div class="no-print">
+        <div style="font-weight: 700; color: #15803d; font-size: 14px;">
+          Sandip Patel &mdash; Order #${order.orderNumber}
         </div>
-
-        <!-- Customer / Shipping Details -->
-        <div class="customer-section">
-          <div class="cust-col">
-            <h3>Bill To / Ship To:</h3>
-            <div class="cust-name">${order.customerName}</div>
-            <div class="cust-text"><strong>Phone:</strong> ${order.customerPhone}</div>
-            <div class="cust-text"><strong>Address:</strong> ${fullAddress}</div>
-            ${order.notes ? `<div class="cust-text" style="margin-top: 6px; font-style: italic; color: #4b5563;"><strong>Note:</strong> ${order.notes}</div>` : ''}
-          </div>
-          <div class="cust-col" style="max-width: 220px; text-align: right;">
-            <h3>Store Dispatch:</h3>
-            <div style="font-weight: 600; color: #111827; font-size: 13px;">Hari Masala Store</div>
-            <div class="cust-text">Pure & Authentic Indian Spices</div>
-            <div class="cust-text">Gujarat, India</div>
-          </div>
-        </div>
-
-        <!-- Items Table -->
-        <table class="items-table">
-          <thead>
-            <tr>
-              <th style="width: 36px; text-align: center;">#</th>
-              <th style="text-align: left;">Item Description</th>
-              <th style="width: 100px; text-align: right;">Price</th>
-              <th style="width: 60px; text-align: center;">Qty</th>
-              <th style="width: 110px; text-align: right;">Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${itemsRows}
-          </tbody>
-        </table>
-
-        <!-- Totals Summary -->
-        <div class="summary-wrapper">
-          <div class="summary-box">
-            <div class="summary-row">
-              <span>Items Subtotal:</span>
-              <span>${formatINR(order.subtotal)}</span>
-            </div>
-            <div class="summary-row">
-              <span>Delivery Charge:</span>
-              <span>${deliveryDisplay}</span>
-            </div>
-            <div class="summary-row total-row">
-              <span>Grand Total:</span>
-              <span>${formatINR(total)}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Terms & Conditions (Smaller font as requested) -->
-        <div class="terms-box">
-          <div class="terms-title">Terms & Conditions / Policy</div>
-          <div class="terms-highlight">&bull; Strictly No Return &amp; No Exchange on food &amp; spice products.</div>
-          <div class="terms-text">&bull; All spices &amp; products are freshly prepared, vacuum/hygienically packed and sealed.</div>
-          <div class="terms-text">&bull; For any issues regarding your shipment, please notify us on WhatsApp (+${settings.whatsappNumber}) within 24 hours of delivery.</div>
-          <div class="terms-text">&bull; This is a computer-generated invoice and does not require an authorized signature.</div>
-        </div>
-
-        <div class="footer-note">
-          Thank you for choosing ${settings.storeName}! Pure spices for authentic taste.
+        <div>
+          <button onclick="window.print()" class="btn-print">🖨️ Print / Save as PDF</button>
+          <button onclick="window.close()" class="btn-close">✕ Close</button>
         </div>
       </div>
+
+      ${cardHtml}
 
       <script>
         window.onload = function() {
           setTimeout(function() {
             window.focus();
             window.print();
-          }, 300);
+          }, 350);
         };
       </script>
     </body>
     </html>
   `
+}
 
-  // Use hidden iframe for clean printing
+/**
+ * Directly opens clean invoice in a new tab (perfect for iPhone Safari / PDF share sheet)
+ */
+export function openInvoiceInNewTab(order: Order, settings: Settings) {
+  if (order.id && typeof window !== 'undefined') {
+    const win = window.open(`/admin/invoice?id=${order.id}`, '_blank')
+    if (win) return
+  }
+  const html = getInvoiceFullHtml(order, settings)
+  const printWin = window.open('', '_blank')
+  if (printWin) {
+    printWin.document.open()
+    printWin.document.write(html)
+    printWin.document.close()
+  }
+}
+
+/**
+ * Cross-platform print handler.
+ * On iPhone (iOS Safari): opens dedicated invoice tab where iOS Safari prints ONLY this single invoice
+ * On Desktop & Android: triggers isolated print with @media print parent isolation
+ */
+export function triggerPrintInvoice(order: Order, settings: Settings) {
+  const html = getInvoiceFullHtml(order, settings)
+  const cardOnly = getInvoiceCardHtml(order, settings)
+
+  // Detect iOS Safari / WebKit (iPhone / iPad / iPod)
+  const isIOS =
+    typeof navigator !== 'undefined' &&
+    (/iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1))
+
+  if (isIOS) {
+    // Calling window.print() inside an invisible iframe causes iOS Safari to print the entire parent page
+    // (displaying all other orders in the admin table).
+    // Opening in a new window/tab gives iOS a dedicated document containing ONLY this invoice.
+    if (order.id && typeof window !== 'undefined') {
+      const win = window.open(`/admin/invoice?id=${order.id}`, '_blank')
+      if (win) return
+    }
+
+    const printWin = window.open('', '_blank')
+    if (printWin) {
+      printWin.document.open()
+      printWin.document.write(html)
+      printWin.document.close()
+      return
+    }
+  }
+
+  // Fallback and in-page container setup
+  let printContainer = document.getElementById('invoice-print-section')
+  if (!printContainer) {
+    printContainer = document.createElement('div')
+    printContainer.id = 'invoice-print-section'
+    document.body.appendChild(printContainer)
+  }
+  printContainer.innerHTML = cardOnly
+
+  // Add isolation class to body so @media print hides all 10 background orders
+  document.body.classList.add('is-printing-invoice')
+
+  const cleanup = () => {
+    document.body.classList.remove('is-printing-invoice')
+    window.removeEventListener('afterprint', cleanup)
+  }
+  window.addEventListener('afterprint', cleanup)
+
+  // Use hidden iframe for clean printing on Android & Desktop
   let iframe = document.getElementById('invoice-print-frame') as HTMLIFrameElement
   if (!iframe) {
     iframe = document.createElement('iframe')
@@ -365,14 +341,21 @@ export function triggerPrintInvoice(order: Order, settings: Settings) {
     iframe.style.width = '0'
     iframe.style.height = '0'
     iframe.style.border = '0'
+    iframe.style.zIndex = '-9999'
     document.body.appendChild(iframe)
   }
 
   const doc = iframe.contentWindow?.document || iframe.contentDocument
   if (doc) {
     doc.open()
-    doc.write(htmlContent)
+    doc.write(html)
     doc.close()
+    setTimeout(cleanup, 4000)
+  } else {
+    setTimeout(() => {
+      window.print()
+      setTimeout(cleanup, 2500)
+    }, 200)
   }
 }
 
@@ -403,6 +386,10 @@ export function OrderInvoiceModal({
     triggerPrintInvoice(order, settings)
   }
 
+  const handleOpenInNewTab = () => {
+    openInvoiceInNewTab(order, settings)
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-3xl max-h-[92vh] overflow-y-auto p-0 flex flex-col gap-0 border-border">
@@ -413,10 +400,20 @@ export function OrderInvoiceModal({
               <Printer className="h-5 w-5 text-primary" /> Invoice Preview &mdash; {order.orderNumber}
             </DialogTitle>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Ready for high-quality printing / PDF generation
+              Sandip Patel &bull; Mo No :- 7359487611
             </p>
           </div>
           <div className="flex items-center gap-2">
+            <Button
+              onClick={handleOpenInNewTab}
+              variant="outline"
+              size="sm"
+              className="gap-1.5 text-xs font-semibold"
+              title="Open in a new clean window / tab (Best for iPhone / Saving PDF)"
+            >
+              <ExternalLink className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Open in</span> New Tab
+            </Button>
             <Button onClick={handlePrint} size="sm" className="bg-primary-gradient hover:opacity-90 text-primary-foreground font-semibold gap-1.5 shadow-sm">
               <Printer className="h-4 w-4" /> Print Invoice
             </Button>
@@ -427,33 +424,12 @@ export function OrderInvoiceModal({
         <div className="p-4 sm:p-6 bg-slate-50 dark:bg-zinc-900/50 flex-1 overflow-y-auto">
           <div className="bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 rounded-xl border border-border/80 shadow-md p-5 sm:p-7 max-w-2xl mx-auto space-y-6">
             
-            {/* Header */}
+            {/* Header with Sandip Patel details */}
             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b-2 border-primary/40 pb-5">
-              <div className="flex items-center gap-3.5">
-                {settings.logoImage ? (
-                  <img
-                    src={settings.logoImage}
-                    alt={settings.storeName}
-                    className="h-14 w-auto object-contain max-w-[140px]"
-                  />
-                ) : (
-                  <img
-                    src="/logo.png"
-                    alt={settings.storeName}
-                    className="h-14 w-auto object-contain max-w-[140px]"
-                    onError={(e) => {
-                      // Fallback text if logo file is not loaded
-                      e.currentTarget.style.display = 'none'
-                    }}
-                  />
-                )}
-                <div>
-                  <h1 className="text-xl font-extrabold text-primary tracking-tight">{settings.storeName}</h1>
-                  <p className="text-xs text-muted-foreground">{settings.storeTagline}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    WhatsApp: <span className="font-semibold text-foreground">+{settings.whatsappNumber}</span>
-                  </p>
-                </div>
+              <div>
+                <h1 className="text-2xl font-black text-primary tracking-tight uppercase">Sandip Patel</h1>
+                <p className="text-sm font-bold text-foreground mt-0.5">Mo No :- 7359487611</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Pure &amp; Authentic Indian Spices &bull; Gujarat, India</p>
               </div>
 
               <div className="text-left sm:text-right">
@@ -464,6 +440,7 @@ export function OrderInvoiceModal({
                   <div>Invoice #: <strong className="text-foreground">{order.orderNumber}</strong></div>
                   <div>Date: <strong className="text-foreground">{dateFormatted}</strong></div>
                   <div>Status: <span className="font-semibold text-primary">{order.status}</span></div>
+                  <div>Payment: <span className="font-semibold text-foreground">WhatsApp Order / COD</span></div>
                 </div>
               </div>
             </div>
@@ -487,8 +464,8 @@ export function OrderInvoiceModal({
               </div>
               <div className="space-y-1 sm:text-right border-t sm:border-t-0 pt-2 sm:pt-0 border-border/50">
                 <p className="font-bold text-[11px] uppercase tracking-wider text-muted-foreground">Dispatched By:</p>
-                <p className="font-bold text-sm text-foreground">{settings.storeName}</p>
-                <p className="text-muted-foreground">Authentic Indian Spices &amp; Blends</p>
+                <p className="font-bold text-sm text-foreground">Sandip Patel</p>
+                <p className="font-bold text-xs text-primary">Mo No :- 7359487611</p>
                 <p className="text-muted-foreground">Gujarat, India</p>
                 <p className="text-muted-foreground">Payment: <strong className="text-foreground">WhatsApp Order / COD</strong></p>
               </div>
@@ -558,7 +535,7 @@ export function OrderInvoiceModal({
               </div>
             </div>
 
-            {/* Terms & Conditions (Strictly No Return & No Exchange in smaller font) */}
+            {/* Terms & Conditions */}
             <div className="rounded-lg border border-dashed border-border bg-muted/15 p-3 text-[11px] space-y-1">
               <p className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground">
                 Terms &amp; Conditions / શરતો:
@@ -570,15 +547,15 @@ export function OrderInvoiceModal({
                 &bull; All items are hygienically prepared and sealed to guarantee fresh aroma &amp; taste.
               </p>
               <p className="text-muted-foreground text-[10px]">
-                &bull; For any dispatch queries, please message us on WhatsApp (+{settings.whatsappNumber}).
+                &bull; For any dispatch queries, please message or call: <strong>Mo No :- 7359487611</strong> within 24 hours of delivery.
               </p>
               <p className="text-muted-foreground text-[10px]">
                 &bull; This is a computer-generated invoice and requires no physical signature.
               </p>
             </div>
 
-            <div className="text-center text-muted-foreground text-xs pt-2 border-t border-border">
-              Thank you for choosing {settings.storeName}! Pure Spices, Authentic Flavours.
+            <div className="text-center text-muted-foreground text-xs pt-2 border-t border-border font-medium">
+              Thank you for your order! &bull; Sandip Patel &bull; Mo No :- 7359487611
             </div>
           </div>
         </div>
@@ -588,7 +565,17 @@ export function OrderInvoiceModal({
           <Button variant="outline" size="sm" onClick={() => onOpenChange(false)}>
             Close
           </Button>
-          <Button size="sm" onClick={handlePrint} className="bg-primary-gradient hover:opacity-90 gap-1.5">
+          <Button
+            onClick={handleOpenInNewTab}
+            variant="outline"
+            size="sm"
+            className="gap-1.5 text-xs font-semibold"
+            title="Open in a new clean tab"
+          >
+            <ExternalLink className="h-3.5 w-3.5" />
+            New Tab
+          </Button>
+          <Button size="sm" onClick={handlePrint} className="bg-primary-gradient hover:opacity-90 gap-1.5 text-primary-foreground font-semibold">
             <Printer className="h-4 w-4" /> Print Invoice
           </Button>
         </div>

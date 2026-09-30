@@ -200,3 +200,55 @@
     background-color: oklch(0.55 0.14 145);
   }
 }
+
+/* Dedicated Print Styles for Order Invoices (cross-platform: iPhone Safari, Android, Desktop) */
+@media print {
+  html, body {
+    height: auto !important;
+    overflow: visible !important;
+    background: #ffffff !important;
+  }
+
+  /* When printing invoice, hide all parent app elements */
+  body.is-printing-invoice > *:not(#invoice-print-section) {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  /* Force hide dialogs, portals, navigation, headers */
+  body.is-printing-invoice [data-radix-portal],
+  body.is-printing-invoice [role="dialog"],
+  body.is-printing-invoice header,
+  body.is-printing-invoice nav,
+  body.is-printing-invoice aside,
+  body.is-printing-invoice footer,
+  body.is-printing-invoice .no-print {
+    display: none !important;
+  }
+
+  /* Show only the single invoice container */
+  body.is-printing-invoice #invoice-print-section {
+    display: block !important;
+    visibility: visible !important;
+    position: static !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #111827 !important;
+  }
+
+  body.is-printing-invoice #invoice-print-section * {
+    visibility: visible !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 8mm 10mm;
+  }
+}
+
