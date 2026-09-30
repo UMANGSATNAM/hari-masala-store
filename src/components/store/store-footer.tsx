@@ -86,8 +86,29 @@ export function StoreFooter({
           </div>
         </div>
 
-        <div className="mt-10 pt-6 border-t border-background/15 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-background/60">
+        <div className="mt-10 pt-6 border-t border-background/15 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-background/70">
           <p>© {new Date().getFullYear()} {settings.storeName}. All rights reserved.</p>
+
+          <div className="flex flex-wrap items-center justify-center gap-1.5 text-center text-background/85">
+            <span>Website by satnamwebservices</span>
+            <a
+              href="https://satnamwebservices.in"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-saffron hover:underline underline-offset-2 transition-colors"
+            >
+              satnamwebservices.in
+            </a>
+            <span>(</span>
+            <a
+              href="tel:+918849866193"
+              className="hover:text-saffron transition-colors font-medium"
+            >
+              +91 8849866193
+            </a>
+            <span>)</span>
+          </div>
+
           <div className="flex items-center gap-4">
             <span>WhatsApp Orders</span>
             <button
